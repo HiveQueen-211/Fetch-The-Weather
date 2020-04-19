@@ -1,0 +1,120 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Dash</title>
+    <link rel="stylesheet" href="styles.css" type="text/css">
+    <script src="https://kit.fontawesome.com/55d9eafb87.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <h1>Current World Weather</h1>
+    <!--section id="unit-switch-container">
+        <ul><button>Unit Selection <i class="fas fa-sort-down"></i></button>
+            <li id="unit-celsius"><button>Celsius</button></li>
+            <li id="unit-farenheit"><button>Farenheit</button></li>
+            <li id="unit-kelvin"><button>Kelvin</button></li>
+        </ul>
+    </section-->
+    <!-- format hours in 12 or 24 -->
+    <!--section id="hour-setting-switch-container">
+        <input type="radio" name="" id="time">
+        <label for="time"></label>
+    </section-->
+    <!-- add a refresh button! to refresh the data -->
+    <section id="container-search-bar">
+        <input type="text" placeholder="Enter a city name">
+        <button type="submit">Submit</button>
+    </section>
+    <section id="container-tab-weather">
+        <article id="copenhagen" class="tab-weather">
+            <ul class="ul-data-overview">
+                <li class="i-weather">
+                    <i class="fas fa-sun"></i>
+                </li>
+                <li class="h-location">
+                    <h3><i class="fas fa-map-marker-alt"></i>Copenhagen, DK</h3>
+                </li>
+                <li class="p-temperature">
+                    <p class="unit metric">8&deg;C</p>
+                </li>
+            </ul>
+            <ul class="ul-data-daylight"><h4>Hours of Daylight</h4>
+                <li class="p-sunrise">
+                    <i class="fas fa-long-arrow-alt-up"></i>
+                    <p>8.00</p>
+                    <p>Sunrise</p>
+                </li>
+                <li class="p-sunset">
+                    <i class="fas fa-long-arrow-alt-down"></i>
+                    <p>21.00</p>
+                    <p>Sunset</p>
+                </li>
+                <li class="p-hours">
+                    <i class="fas fa-clock"></i>
+                    <p>13</p>
+                    <p>Hours of Light</p>
+                </li>
+            </ul>
+            <ul class="ul-data-temperature"><h4>Temperature</h4>
+                <li class="p-feels">
+                    <i class="fas fa-thermometer-three-quarters"></i>
+                    <p class="unit metric">4&deg;C</p>
+                    <p>Feels Like</p>
+                </li>
+                <li class="p-min">
+                    <i class="fas fa-temperature-low"></i>
+                    <p class="unit metric">2&deg;C</p>
+                    <p>Minimum</p>
+                </li>
+                <li class="p-max">
+                    <i class="fas fa-temperature-high"></i>
+                    <p class="unit metric">12&deg;C</p>
+                    <p>Maximum</p>
+                </li>
+                <li class="p-press">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <p>2</p>
+                    <p>Pressure</p>
+                </li>
+                <li class="p-humid">
+                    <i class="fas fa-smog"></i>
+                    <p class="unit metric">12%</p>
+                    <p>Humidity</p>
+                </li>
+            </ul>
+            <ul class="ul-data-wind"><h4>Wind</h4>
+                <li class="p-speed">
+                    <i class="fas fa-running"></i>
+                    <p>23<span class="unit metric">mph</span></p>
+                    <p>Speed</p>
+                </li>
+                <li class="p-deg">
+                    <i class="fas fa-location-arrow"></i>
+                    <p>320&deg;</p>
+                    <p>Degree</p>
+                </li>
+            </ul>
+        </article>
+    </section>
+
+    <!-- icons -- weather, dynamic (processed by script)
+    
+    <i class="fas fa-sun"></i> -- sun
+    <i class="fas fa-moon"></i> -- moon
+    <i class="fas fa-cloud"></i> -- cloud with sun behind
+    <i class="fas fa-cloud-moon"></i> -- cloud with moon behind
+    <i class="fas fa-cloud-sun-rain"></i> -- raining cloud with sun behind
+    <i class="fas fa-cloud-moon-rain"></i> -- raining cloud with moon behind
+    <i class="fas fa-cloud"></i> -- cloud
+    <i class="fas fa-cloud-rain"></i> - showering cloud
+    <i class="fas fa-cloud-showers-heavy"></i> -- heavy raining cloud
+    <i class="fas fa-bolt"></i> -- thunder bolt
+    
+    <i class="fas fa-chevron-up"></i> -- up arrow (display sunrise) (for now)
+    <i class="fas fa-chevron-down"></i> -- down arrow (display sunset) (for now)
+
+    <i class="fas fa-wind"></i> -- wind -->
+    <footer><p>Powered by OpenWeather API</p></footer>
+    <script src="script.js"></script>
+</body>
+</html>

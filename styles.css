@@ -1,0 +1,72 @@
+@import url('https://fonts.googleapis.com/css?family=Varela+Round&display=swap');
+:root {
+    --wrapper-width: 36rem;
+    --tab-width: 15rem;
+    --tab-height: 4rem;
+
+    --rgba-shadow: rgba(216, 216, 216, .9);
+}
+
+/* defaults + resets */
+
+* { box-sizing: border-box; }
+
+html { font-size: 20px; font-family: "Varela Round", sans-serif; }
+
+body { margin: 0; }
+
+ul { padding-inline-start: 0; list-style: none; }
+
+/* element styling */
+
+h1,
+#container-search-bar,
+#container-tab-weather { /* elms with wrapper-container behavior */
+    display: flex;
+    flex-wrap: row wrap;
+    width: var(--wrapper-width);
+    margin: 0 auto 5em auto;
+    height: fit-content;
+}
+
+#container-search-bar input::placeholder {
+    font-style: italic;
+}
+#container-search-bar input:focus::placeholder {
+    font-style: normal;
+}
+.tab-weather { /* contains all tab-weather data */
+    width: var(--tab-width);
+    height: fit-content;
+    box-shadow: 2px 2px 5px var(--rgba-shadow);
+    border-radius: 1em;
+    font-size: .75rem;
+}
+
+.tab-weather ul h4 { width: 100%; text-align: center; }
+
+.tab-weather ul:not(.ul-data-overview) {
+    display: flex;
+    flex-flow: row wrap;
+}
+.tab-weather ul:not(.ul-data-overview) li {
+    display: flex;
+    flex-flow: column wrap;
+    align-content: center;
+    text-align: center;
+    flex-grow: 2;
+    min-width: 33%;
+    max-width: 100%;
+    height: fit-content;
+}
+.tab-weather ul:not(.ul-data-overview) li p:first-of-type { /* targets data */
+    font-family: "Montserrat", sans-serif;
+    font-size: 1.5rem;
+}
+
+
+footer {
+    width: 100%;
+    padding: 2em;
+    text-align: center;
+}
