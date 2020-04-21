@@ -17,24 +17,52 @@ body { margin: 0; }
 
 ul { padding-inline-start: 0; list-style: none; }
 
+
+/* icon resets */
+#dropdown-units .fa-sort-down { position: relative; bottom: 2px; }
+
 /* element styling */
 
 h1,
-#container-search-bar,
+#container-controls,
 #container-tab-weather { /* elms with wrapper-container behavior */
     display: flex;
-    flex-wrap: row wrap;
+    flex-flow: row wrap;
     width: var(--wrapper-width);
-    margin: 0 auto 5em auto;
+    margin: 1em auto;
     height: fit-content;
+    border: 2px solid black;
 }
 
-#container-search-bar input::placeholder {
-    font-style: italic;
+
+#container-controls input:not([type="radio"]),
+#container-controls button,
+#container-controls label {
+    height: 4em;
+    padding: 1em;
 }
-#container-search-bar input:focus::placeholder {
-    font-style: normal;
+
+#search-bar { 
+    display: flex; 
+    flex-flow: row wrap; 
+    width: 100%;
 }
+#search-bar input[type="text"] { flex-grow: 1; }
+#search-bar input::placeholder { font-style: italic; }
+#search-bar input:focus::placeholder { font-style: normal; }
+#search-bar button { width: fit-content; padding: 0 2em; }
+
+#dropdown-units,
+#switch-hour-format { width: 50%; }
+
+#dropdown-units > *,
+#switch-hour-format > * {
+    width: 100%;
+}
+
+#dropdown-units ul { margin: 0; display: none; }
+
+
 .tab-weather { /* contains all tab-weather data */
     width: var(--tab-width);
     height: fit-content;

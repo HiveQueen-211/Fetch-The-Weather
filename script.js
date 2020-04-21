@@ -1,24 +1,10 @@
-//variable declarations
+/* variable declarations */
 const unitFormats = ["metric", "imperial"];
+const timeFormats = ["12", "24"];
 let current_unitFormat = "metric";
 
-let settings = {
-    default_unit: "metric",   
-    city_names: [
-        {
-            name: "Tokyo", 
-            default: false
-        },
-        {
-            name: "Copenhagen",
-            default: true
-        }
-    ]
-};
-
-
-//promise functions
-const getWeather_DataCoords = () => {
+/* promise functions */
+const getWeather_dataCoords = () => {
     return new Promise(function(resolve, reject) {
         navigator.geolocation.getCurrentPosition(resolve, reject);
     });
@@ -26,6 +12,10 @@ const getWeather_DataCoords = () => {
 
 const getWeather_geoFwd = (address) => {
     return geoFwdAPI(address);
+}
+
+const getWeather_ip = () => {
+    return ipAPI();
 }
 
 const errorHandler = (data) => { //find all the errors and make the site behave accordingly
@@ -40,65 +30,159 @@ const errorHandler = (data) => { //find all the errors and make the site behave 
         default:
             break;
     }
-    console.log("Error code:", data.code, "\nMessage:",  data.message);
+    //console.log("Error code:", data.code, "\nMessage:",  data.message);
     //fall back?
 };
 
 const geoFwdAPI = (address) => { //call Geo Forwarding API
     const apiKey = `74d5b9f01b4b1c640e8b2c7a401a3f33`;
     const callURL = `http://api.positionstack.com/v1/forward?access_key=${apiKey}&query=${address}&limit=1`;
-    fetch(callURL)
+    return fetch(callURL)
     .then(response => response.json())
-    .then(geoForward)
+    .then(geoFwd)
     .catch(err => { errorHandler(err) });
+}
+
+const geoFwd = (response) => { //process Geo Forwarding response, call Weather API
+    let {latitude, longitude} = response.data[0];
+    weatherAPI(latitude, longitude);
 }
 
 const weatherAPI = (latitude, longitude) => { //call Weather API
     const apiKey = `afc3b45d0bea226dd7cffba0f8efb229`;
     const callURL = `https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&appid=${apiKey}`;
-    fetch(callURL)
+    return fetch(callURL)
     .then(response => response.json())
     .then(renderResponse)
     .catch(err => { errorHandler(err) });
 }
 
-const geoForward = (response) => { //process Geo Forwarding response, call Weather API
-    let {latitude, longitude} = response.data[0];
-    weatherAPI(latitude, longitude);
+const ipAPI = () => {
+    const callURL = `http://ip-api.com/json/?fields=status,message,query,lat,lon`;
+    return fetch(callURL)
+    .then(response => response.json())
+    .then(ipFwd)
+    .catch(err => { errorHandler(err) });
 }
 
-const renderResponse = (response) => { //render api contents to DOM
-    console.log("congratulations!");
+const ipFwd = (response) => {
+    let {lat, lon} = response;
+    console.log(lat, lon);
+    weatherAPI(lat, lon);
+}
+
+const renderResponse = (response) => {
+    /*  instructions: 
+        render api contents to DOM
+    */
     console.log(response);
-    return;
+    //console.log(response.timezone, response.lat, response.lon);
+    //appendDOM_City(response);
 };
 
 
-//event listeners
+/* data persistence functions */
+const arrDefaultData = {
+    default_unit: "metric",
+    cities: [
+        {
+            name: "Prague",
+            lat: 50.07,
+            lon: 12.37
+        },
+        {
+            name: "Copenhagen",
+            lat: 55.64,
+            lon: 12.55
+        }
+    ]
+};
 
-
-
-//script init
-if (!localStorage.weatherDash) {
-    localStorage.setItem("weatherDash", JSON.stringify(settings));
+if (!localStorage.weatherDash || localStorage.weatherDash === "[]") {
+    localStorage.setItem("weatherDash", JSON.stringify(arrDefaultData));
 }
 
-getWeather_DataCoords()
+let jData = JSON.parse(localStorage.weatherDash);
+
+console.log(jData);
+
+const addArr_City = (name, lat, long) => {
+    const obj = {
+        name,
+        lat,
+        long
+    }
+    jData.cities.push(obj);
+    return localStorage.setItem("weatherDash", JSON.stringify(jData));
+    //appendDOM_city(obj); -- unfinished function
+}
+
+const removeArr_City = (name) => {
+    jData.cities.splice(name, 1);
+    //remove elm by class name, click on icon
+    return localStorage.setItem("weatherDash", JSON.stringify(jData));
+}
+
+const appendDOM_City = (data) => {
+    const ul_dt = document.getElementById("ul-data-tabs");
+    const fragment = document.createDocumentFragment();
+    //work on this after having made a dummy data-tab
+    //will know when I decide what data to display!
+}
+
+const appendDOM_Cities = () => {
+    jData.cities.forEach(data => {
+        return appendDOM_City(data);
+    });
+}
+
+
+
+/* event listeners */
+
+
+
+/* script init */
+
+getWeather_dataCoords()
 .then((data) => { 
     weatherAPI(data.coords.latitude, data.coords.longitude) 
 }).catch((err) => {
-    errorHandler(err)
+    return errorHandler(err);
+    //fallback --> does user want to give IP address instead? ipAPI()
 });
 
 getWeather_geoFwd("Cheb");
 
-/* NOTE-ATO POTATO */ 
+appendDOM_Cities();
 
-//when is the API called?
-//The API is called when:
-//  The user searches for weather by city --> getWeather_geoFwd()
-//  The user provides their GeoLocation --> getWeather_DataCoords()
-//  The user has previously set a default city, and is coming back to check on their location
-//      And what if the user is currently in their default city? Will Geolocation still be the default?
 
-//How will weather from these different cities be displayed? -- How will the UI look?
+
+/*  NOTE-ATO POTATO:
+
+    - When should getWeather_geoFwd() be called?
+        thinking --> When the user searches for a city in the query?
+
+    - When should the ipAPI be called?
+        + The user will click on a prompt, which will ask them for permission to use their IP address
+        + If the user gives permission, ipAPI() will get data.
+
+    - To use "in-house conversions" or not?
+        thinking(y) --> limit the # of calls to an API.
+                    --> if the in-house conversions are done on app, it would be more functional
+                    --> if done automatically, then values can be created automatically
+                    --> should I use object types?
+        thinking(n) --> calling and storing everything at once will reduce necessary calculations
+    
+    - Concern: I cannot get any city name from the particular OpenWeather API call.
+               I can only get the city from the reverse geolocation, but this will not work when data is recieved from the API.
+
+    - Object Creation, to save into jData & localStorage.
+
+    - What data should I save and store from the API? & what data should I display from the API?
+
+    - I should put:
+        + A refresh data button
+
+    - Need to go through the errors, at some point!
+*/

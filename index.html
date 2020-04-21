@@ -7,26 +7,37 @@
     <script src="https://kit.fontawesome.com/55d9eafb87.js" crossorigin="anonymous"></script>
 </head>
 <body>
+
     <h1>Current World Weather</h1>
-    <!--section id="unit-switch-container">
-        <ul><button>Unit Selection <i class="fas fa-sort-down"></i></button>
-            <li id="unit-celsius"><button>Celsius</button></li>
-            <li id="unit-farenheit"><button>Farenheit</button></li>
-            <li id="unit-kelvin"><button>Kelvin</button></li>
-        </ul>
-    </section-->
-    <!-- format hours in 12 or 24 -->
-    <!--section id="hour-setting-switch-container">
-        <input type="radio" name="" id="time">
-        <label for="time"></label>
-    </section-->
-    <!-- add a refresh button! to refresh the data -->
-    <section id="container-search-bar">
-        <input type="text" placeholder="Enter a city name">
-        <button type="submit">Submit</button>
+
+    <section id="container-controls">
+        <section id="search-bar">
+            <input type="text" placeholder="Enter a city name">
+            <button type="submit">Submit</button>
+        </section>
+        <section id="dropdown-units">
+            <button>Unit Selection <i class="fas fa-sort-down"></i></button>
+            <ul>
+                <li id="unit-celsius"><button>Celsius</button></li>
+                <li id="unit-farenheit"><button>Farenheit</button></li>
+                <li id="unit-kelvin"><button>Kelvin</button></li>
+            </ul>
+        </section>
+        <section id="switch-hour-format">
+            <input type="radio" name="" id="time">
+            <label for="time">Hour Format</label>
+        </section>
     </section>
-    <section id="container-tab-weather">
+
+
+    <!-- add a refresh button! to refresh the data -->
+
+    
+    <!--section id="container-tab-weather">
         <article id="copenhagen" class="tab-weather">
+            <ul id="ul-data-tabs">
+
+            </ul>
             <ul class="ul-data-overview">
                 <li class="i-weather">
                     <i class="fas fa-sun"></i>
@@ -95,7 +106,7 @@
                 </li>
             </ul>
         </article>
-    </section>
+    </section-->
 
     <!-- icons -- weather, dynamic (processed by script)
     
