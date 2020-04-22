@@ -19,7 +19,7 @@ const getWeather_ip = () => {
 }
 
 const errorHandler = (data) => { //find all the errors and make the site behave accordingly
-    //console.log(data);
+    console.log(data);
     switch (data.code) {
         case 2:
             //geolocation cannot connect to internet
@@ -50,7 +50,8 @@ const geoFwd = (response) => { //process Geo Forwarding response, call Weather A
 
 const weatherAPI = (latitude, longitude) => { //call Weather API
     const apiKey = `afc3b45d0bea226dd7cffba0f8efb229`;
-    const callURL = `https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&appid=${apiKey}`;
+    const unitFormat = `metric`;
+    const callURL = `https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&units=${unitFormat}&appid=${apiKey}`;
     return fetch(callURL)
     .then(response => response.json())
     .then(renderResponse)
@@ -61,11 +62,11 @@ const ipAPI = () => {
     const callURL = `http://ip-api.com/json/?fields=status,message,query,lat,lon`;
     return fetch(callURL)
     .then(response => response.json())
-    .then(ipFwd)
+    .then(ipCoordCall)
     .catch(err => { errorHandler(err) });
 }
 
-const ipFwd = (response) => {
+const ipCoordCall = (response) => {
     let {lat, lon} = response;
     console.log(lat, lon);
     weatherAPI(lat, lon);
@@ -112,22 +113,23 @@ const addArr_City = (name, lat, long) => {
         lat,
         long
     }
-    jData.cities.push(obj);
-    return localStorage.setItem("weatherDash", JSON.stringify(jData));
-    //appendDOM_city(obj); -- unfinished function
+    if (arrValidator()) {
+        jData.cities.push(obj);
+        localStorage.setItem("weatherDash", JSON.stringify(jData));
+        appendDOM_city(obj);
+    } else {
+        console.log("jData Cities is too long!");
+    }
 }
 
 const removeArr_City = (name) => {
     jData.cities.splice(name, 1);
-    //remove elm by class name, click on icon
     return localStorage.setItem("weatherDash", JSON.stringify(jData));
 }
 
 const appendDOM_City = (data) => {
     const ul_dt = document.getElementById("ul-data-tabs");
     const fragment = document.createDocumentFragment();
-    //work on this after having made a dummy data-tab
-    //will know when I decide what data to display!
 }
 
 const appendDOM_Cities = () => {
@@ -137,10 +139,33 @@ const appendDOM_Cities = () => {
 }
 
 
+/* string format functions */
+
+const inputFormat = (str) => {
+    return str = str.trim();
+}
+
+const arrValidator = () => {
+    const bool = (jData.cities.length < 5);
+    return bool;
+}
 
 /* event listeners */
 
+const btnSubmit = document.querySelector('#search-bar button[type="submit"]');
+const inputSubmit = document.querySelector('#search-bar input[type="text"]');
 
+btnSubmit.onclick = function() {
+    let val = inputSubmit.value;
+        val = inputFormat(val);
+    return arrValidator() ? getWeather_geoFwd(val)
+                          : console.log("jData Cities is too long!");
+}
+//undefined -- enter a valid city name..
+
+inputSubmit.onkeypress = function(event) {
+    if (event.keyCode === 13) { btnSubmit.click(); }
+}
 
 /* script init */
 
@@ -172,12 +197,11 @@ appendDOM_Cities();
                     --> if the in-house conversions are done on app, it would be more functional
                     --> if done automatically, then values can be created automatically
                     --> should I use object types?
-        thinking(n) --> calling and storing everything at once will reduce necessary calculations
+        thinking(n) --> calling and storing everything at once will reduce necessary calculations..
     
-    - Concern: I cannot get any city name from the particular OpenWeather API call.
-               I can only get the city from the reverse geolocation, but this will not work when data is recieved from the API.
-
-    - Object Creation, to save into jData & localStorage.
+    - Concern: I cannot get city name from OpenWeather API call. Not good for geolocation
+               I can get city name from reverse geolocation, by entering it into the query
+               I can get city name from ip api
 
     - What data should I save and store from the API? & what data should I display from the API?
 
