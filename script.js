@@ -73,12 +73,8 @@ const ipCoordCall = (response) => {
 }
 
 const renderResponse = (response) => {
-    /*  instructions: 
-        render api contents to DOM
-    */
-    console.log(response);
     //console.log(response.timezone, response.lat, response.lon);
-    //appendDOM_City(response);
+    appendDOM_City(response);
 };
 
 
@@ -130,6 +126,46 @@ const removeArr_City = (name) => {
 const appendDOM_City = (data) => {
     const ul_dt = document.getElementById("ul-data-tabs");
     const fragment = document.createDocumentFragment();
+
+    const {
+        current,
+        daily,
+        hourly
+    } = data;
+    
+    const frag_current = document.createDocumentFragment();
+    const li_daily = document.createDocumentFragment();
+    const li_hourly = document.createDocumentFragment();
+    
+    let ul_current = document.createElement("ul")
+
+    for (let item in current) {
+        let li = document.createElement("li");
+        
+        if (typeof current[item] === "object") {
+            let ul_inner = document.createElement("ul");
+            for (let i in current[item]) {
+                console.log(i)
+                /*let p = document.createElement("p");
+                p.className = i;
+                p.textContent = item[i];
+                ul_inner.appendChild(p);*/
+            }
+            console.log(current[item]);
+        }
+        else {
+            let p = document.createElement("p");
+            
+            p.className = item;
+            p.textContent = current[item];
+            
+            li.appendChild(p);
+            ul_current.appendChild(li);
+        }
+    }
+
+    console.log(ul_current);
+
 }
 
 const appendDOM_Cities = () => {
@@ -177,9 +213,9 @@ getWeather_dataCoords()
     //fallback --> does user want to give IP address instead? ipAPI()
 });
 
-getWeather_geoFwd("Cheb");
+//getWeather_geoFwd("Cheb");
 
-appendDOM_Cities();
+/*appendDOM_Cities();*/
 
 
 

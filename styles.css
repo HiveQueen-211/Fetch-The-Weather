@@ -54,7 +54,6 @@ h1,
 
 #dropdown-units,
 #switch-hour-format { width: 50%; }
-
 #dropdown-units > *,
 #switch-hour-format > * {
     width: 100%;
@@ -62,6 +61,46 @@ h1,
 
 #dropdown-units ul { margin: 0; display: none; }
 
+#container-tab-weather {
+    flex-flow: column wrap;
+}
+
+#container-tab-weather ul,
+#container-tab-weather ul li.weather-list,
+#container-tab-weather ul li.temp-list,
+#container-tab-weather ul li.feels_like-list {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    width: 100%;
+}
+#container-tab-weather ul:not(#hourly-data) li:not(.weather-list):not(.temp-list):not(.feels_like-list),
+#container-tab-weather ul li ul li {
+    display: flex;
+    flex-flow: column wrap;
+    align-items: center;
+    min-width: 10em;
+    flex-grow: 1;
+    border: 2px solid black;
+}
+
+
+
+/*.tab-weather {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: fit-content;
+}
+.tab-weather section {
+    display: flex;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+.tab-weather section:first-of-type {
+    display: flex;
+}*/
 
 /*.tab-weather {
     width: var(--tab-width);
