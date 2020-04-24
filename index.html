@@ -8,9 +8,8 @@
 </head>
 <body>
 
-    <h1>Current World Weather</h1>
-
     <section id="container-controls">
+        <h1>Current World Weather</h1>
         <section id="search-bar">
             <input type="text" placeholder="Enter a city name">
             <button type="submit">Submit</button>
@@ -27,6 +26,11 @@
             <input type="checkbox" name="" id="time">
             <label for="time">Hour Format</label>
         </section>
+        <ul id="list-saved-cities"><p>Saved Locations</p>
+            <li><a>Geo Location</a></li>
+            <li><a>IP Location</a></li>
+        </ul>
+        <p id="stats-storage">0 of 5 cities</p>
     </section>
 
     <section id="container-tab-weather">
@@ -840,7 +844,6 @@
         </article>
     </section>
 
-    
     <!--section id="container-tab-weather">
         <article id="copenhagen" class="tab-weather">
             <ul id="ul-data-tabs">

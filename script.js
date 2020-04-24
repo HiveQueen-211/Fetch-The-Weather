@@ -74,25 +74,15 @@ const ipCoordCall = (response) => {
 
 const renderResponse = (response) => {
     //console.log(response.timezone, response.lat, response.lon);
-    appendDOM_City(response);
+    console.log(response);
+    //appendDOM_City(response);
 };
 
 
 /* data persistence functions */
 const arrDefaultData = {
     default_unit: "metric",
-    cities: [
-        {
-            name: "Prague",
-            lat: 50.07,
-            lon: 12.37
-        },
-        {
-            name: "Copenhagen",
-            lat: 55.64,
-            lon: 12.55
-        }
-    ]
+    cities: ["Prague", "Copenhagen"]
 };
 
 if (!localStorage.weatherDash || localStorage.weatherDash === "[]") {
@@ -103,16 +93,10 @@ let jData = JSON.parse(localStorage.weatherDash);
 
 console.log(jData);
 
-const addArr_City = (name, lat, long) => {
-    const obj = {
-        name,
-        lat,
-        long
-    }
-    if (arrValidator()) {
-        jData.cities.push(obj);
+const addArr_City = (city) => {
+    if (arrValidate_Length()) {
+        jData.cities.push(city);
         localStorage.setItem("weatherDash", JSON.stringify(jData));
-        appendDOM_city(obj);
     } else {
         console.log("jData Cities is too long!");
     }
@@ -123,7 +107,9 @@ const removeArr_City = (name) => {
     return localStorage.setItem("weatherDash", JSON.stringify(jData));
 }
 
-const appendDOM_City = (data) => {
+
+/* DOM functions */
+const appendDOM_City = (data) => { //function for manipulating weather data
     const ul_dt = document.getElementById("ul-data-tabs");
     const fragment = document.createDocumentFragment();
 
@@ -145,13 +131,13 @@ const appendDOM_City = (data) => {
         if (typeof current[item] === "object") {
             let ul_inner = document.createElement("ul");
             for (let i in current[item]) {
-                console.log(i)
+                //console.log(i)
                 /*let p = document.createElement("p");
                 p.className = i;
                 p.textContent = item[i];
                 ul_inner.appendChild(p);*/
             }
-            console.log(current[item]);
+            //console.log(current[item]);
         }
         else {
             let p = document.createElement("p");
@@ -163,28 +149,49 @@ const appendDOM_City = (data) => {
             ul_current.appendChild(li);
         }
     }
-
-    console.log(ul_current);
+    //console.log(ul_current);
+    //console.log(data);
 
 }
 
-const appendDOM_Cities = () => {
+const appendLi_City = (data) => {
+    const ul_savedCities = document.querySelector('#list-saved-cities');
+    const fragment = document.createDocumentFragment();
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+    const strLowerCase = data.toLowerCase();
+    
+    a.textContent = data;
+    li.id = `li-${strLowerCase}`;
+    li.appendChild(a);
+    fragment.appendChild(li);
+    ul_savedCities.appendChild(fragment);
+}
+
+const loadLi_Cities = () => {
     jData.cities.forEach(data => {
-        return appendDOM_City(data);
+        return appendLi_City(data);
     });
 }
 
 
-/* string format functions */
+/* format & validator functions */
 
 const inputFormat = (str) => {
     return str = str.trim();
 }
 
-const arrValidator = () => {
+const arrValidate_Length = () => {
     const bool = (jData.cities.length < 5);
     return bool;
 }
+
+const arrValidate_City = (city) => {
+    const arr = jData.cities;
+    const bool = arr.includes(city);
+    return bool;
+}
+
 
 /* event listeners */
 
@@ -194,13 +201,31 @@ const inputSubmit = document.querySelector('#search-bar input[type="text"]');
 btnSubmit.onclick = function() {
     let val = inputSubmit.value;
         val = inputFormat(val);
-    return arrValidator() ? getWeather_geoFwd(val)
-                          : console.log("jData Cities is too long!");
+    if (arrValidate_Length() && val.length > 0 && arrValidate_City(val) === false) {
+        addArr_City(val);
+        appendLi_City(val);
+        return getWeather_geoFwd(val);
+    } else {
+        return console.log("jData Cities is too long, or JDataCities already has the city name!");
+    }
 }
-//undefined -- enter a valid city name..
+//undefined -- error from server -- enter a valid city name..
 
 inputSubmit.onkeypress = function(event) {
     if (event.keyCode === 13) { btnSubmit.click(); }
+}
+
+const liCities = document.querySelector("#list-saved-cities");
+liCities.onclick = function(event) {
+    const elm = event.target;
+    let val;
+    if (elm.nodeName === "LI") {
+        val = document.querySelector("#" + elm.id).querySelector("a").textContent;
+    } else if (elm.nodeName === "A") {
+        const parent = elm.closest("li");
+        val = parent.querySelector("a").textContent;
+    }
+    if (val) { return getWeather_geoFwd(val); }
 }
 
 /* script init */
@@ -210,12 +235,12 @@ getWeather_dataCoords()
     weatherAPI(data.coords.latitude, data.coords.longitude) 
 }).catch((err) => {
     return errorHandler(err);
-    //fallback --> does user want to give IP address instead? ipAPI()
+    //add fallback --> does user want to give IP address instead? ipAPI()
 });
 
-//getWeather_geoFwd("Cheb");
+getWeather_geoFwd("Cheb");
 
-/*appendDOM_Cities();*/
+loadLi_Cities();
 
 
 

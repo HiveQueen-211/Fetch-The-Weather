@@ -23,7 +23,7 @@ ul { padding-inline-start: 0; list-style: none; }
 
 /* element styling */
 
-h1,
+
 #container-controls,
 #container-tab-weather { /* elms with wrapper-container behavior */
     display: flex;
@@ -34,7 +34,15 @@ h1,
     border: 2px solid black;
 }
 
-
+#container-controls {
+    position: fixed;
+    align-content: flex-start;
+    height: calc(100vh);
+    width: 20em;
+    top: 0;
+    margin: 0;
+    padding: .5em;
+}
 #container-controls input:not([type="checkbox"]),
 #container-controls button,
 #container-controls label {
@@ -60,6 +68,20 @@ h1,
 }
 
 #dropdown-units ul { margin: 0; display: none; }
+
+#list-saved-cities { width: 100%; }
+#list-saved-cities li,
+#list-saved-cities li a { cursor: pointer; }
+
+#container-controls #stats-storage {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-self: flex-end;
+    position: absolute;
+    bottom: 0;
+}
+
 
 #container-tab-weather {
     flex-flow: column wrap;
