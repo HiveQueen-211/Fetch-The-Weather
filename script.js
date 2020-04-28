@@ -3,6 +3,8 @@ const unitFormats = ["metric", "imperial"];
 const timeFormats = ["12", "24"];
 let current_unitFormat = "metric";
 
+
+
 /* promise functions */
 const getWeather_dataCoords = () => {
     return new Promise(function(resolve, reject) {
@@ -68,18 +70,18 @@ const ipAPI = () => {
 
 const ipCoordCall = (response) => {
     let {lat, lon} = response;
-    console.log(lat, lon);
     weatherAPI(lat, lon);
 }
 
 const renderResponse = (response) => {
-    //console.log(response.timezone, response.lat, response.lon);
-    console.log(response);
-    //appendDOM_City(response);
+    appendDOM_City(response); 
+    updateP_statsStorage();
 };
 
 
+
 /* data persistence functions */
+
 const arrDefaultData = {
     default_unit: "metric",
     cities: ["Prague", "Copenhagen"]
@@ -91,8 +93,6 @@ if (!localStorage.weatherDash || localStorage.weatherDash === "[]") {
 
 let jData = JSON.parse(localStorage.weatherDash);
 
-console.log(jData);
-
 const addArr_City = (city) => {
     if (arrValidate_Length()) {
         jData.cities.push(city);
@@ -103,76 +103,12 @@ const addArr_City = (city) => {
 }
 
 const removeArr_City = (name) => {
-    jData.cities.splice(name, 1);
+    const arr = jData.cities;
+    name = titleCase(name);
+    jData.cities = arr.filter(item => item != name);
     return localStorage.setItem("weatherDash", JSON.stringify(jData));
 }
 
-
-/* DOM functions */
-const appendDOM_City = (data) => { //function for manipulating weather data
-    const ul_dt = document.getElementById("ul-data-tabs");
-    const fragment = document.createDocumentFragment();
-
-    const {
-        current,
-        daily,
-        hourly
-    } = data;
-    
-    const frag_current = document.createDocumentFragment();
-    const li_daily = document.createDocumentFragment();
-    const li_hourly = document.createDocumentFragment();
-    
-    let ul_current = document.createElement("ul")
-
-    for (let item in current) {
-        let li = document.createElement("li");
-        
-        if (typeof current[item] === "object") {
-            let ul_inner = document.createElement("ul");
-            for (let i in current[item]) {
-                //console.log(i)
-                /*let p = document.createElement("p");
-                p.className = i;
-                p.textContent = item[i];
-                ul_inner.appendChild(p);*/
-            }
-            //console.log(current[item]);
-        }
-        else {
-            let p = document.createElement("p");
-            
-            p.className = item;
-            p.textContent = current[item];
-            
-            li.appendChild(p);
-            ul_current.appendChild(li);
-        }
-    }
-    //console.log(ul_current);
-    //console.log(data);
-
-}
-
-const appendLi_City = (data) => {
-    const ul_savedCities = document.querySelector('#list-saved-cities');
-    const fragment = document.createDocumentFragment();
-    const li = document.createElement("li");
-    const a = document.createElement("a");
-    const strLowerCase = data.toLowerCase();
-    
-    a.textContent = data;
-    li.id = `li-${strLowerCase}`;
-    li.appendChild(a);
-    fragment.appendChild(li);
-    ul_savedCities.appendChild(fragment);
-}
-
-const loadLi_Cities = () => {
-    jData.cities.forEach(data => {
-        return appendLi_City(data);
-    });
-}
 
 
 /* format & validator functions */
@@ -192,6 +128,134 @@ const arrValidate_City = (city) => {
     return bool;
 }
 
+const timeFormat = (property, date) => {
+    switch (property) {
+        case "sunrise":
+        case "sunset":
+        case "dt":
+            let newDate = new Date(date);
+            let strTime = `${newDate.getHours()}.${newDate.getMinutes()}`;
+            console.log(strTime);
+            return strTime;
+        default: break;
+    }
+}
+
+const titleCase = (str) => {
+    let temp = str.toLowerCase().split(" ");
+    for (let i = 0; i < temp.length; i++) {
+        temp[i] = temp[i][0].toUpperCase() + temp[i].slice(1);
+    }
+    return str = temp.join(" ");
+}
+
+
+
+/* DOM functions */
+const appendDOM_City = (data) => {
+    const ul_dt = document.getElementById("ul-data-tabs");
+    const fragment = document.createDocumentFragment();
+
+    const ul_current = document.querySelector("#current-weather")
+
+    const {
+        current,
+        daily,
+        hourly
+    } = data;
+    
+    for (let item in current) {
+        const property = item;
+        let content = current[item];
+        
+        switch (property) {
+            case "sunrise":
+            case "sunset":
+            case "dt":
+                let newDate = new Date(content*1000);
+                let strTime = `${newDate.getHours()}.${newDate.getMinutes()}`;
+                content = strTime;
+                break;
+            default: break;
+        }
+
+        if (typeof content === "number" || typeof content === "string") {
+            let p = ul_current.querySelector(`li.${property} p:first-of-type`);
+            if (p) { p.textContent = content; }
+        }
+
+        if (typeof content === "object" && property === "weather") { //needs optimization
+            const ul = ul_current.querySelector('li.weather ul');
+            
+            const li_main = document.createElement("li");
+            const li_desc = document.createElement("li"); 
+            
+            const p_main = document.createElement("p");
+            const p_desc = document.createElement("p");
+            
+            const str = `Description: `;
+            
+            li_main.textContent = str;
+            li_desc.textContent = str;
+
+            for (let index in content) {
+                const { main, description } = content[index];
+                
+                p_main.textContent += main;
+                p_desc.textContent += description;
+
+                if (content.indexOf(index) > -1 ||
+                    content.indexOf(index) >= content.length) {
+                    li_main.textContent += `, `;
+                    li_desc.textContent += `, `;
+                }
+
+                li_main.appendChild(p_main);
+                li_desc.appendChild(p_desc);
+            }
+            ul.appendChild(li_main);
+            ul.appendChild(li_desc);
+        }
+    }
+
+}
+
+const appendLi_City = (data) => {
+    const ul_savedCities = document.querySelector('#list-saved-cities');
+    const fragment = document.createDocumentFragment();
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+    const strLowerCase = data.toLowerCase();
+    const i_trash = document.createElement("i");
+
+    i_trash.classList = "fas fa-trash alt";
+
+    a.textContent = data;
+    
+    li.id = `li-${strLowerCase}`;
+    
+    li.appendChild(a);
+    li.appendChild(i_trash);
+    
+    fragment.appendChild(li);
+    
+    ul_savedCities.appendChild(fragment);
+}
+
+const loadLi_Cities = () => {
+    jData.cities.forEach(data => {
+        return appendLi_City(data);
+    });
+}
+
+
+const updateP_statsStorage = () => {
+    const arrCities = jData.cities;
+    const p = document.querySelector('p#stats-storage');
+    p.textContent =  arrCities.length + " of 5 cities";
+}
+
+
 
 /* event listeners */
 
@@ -202,9 +266,10 @@ btnSubmit.onclick = function() {
     let val = inputSubmit.value;
         val = inputFormat(val);
     if (arrValidate_Length() && val.length > 0 && arrValidate_City(val) === false) {
-        addArr_City(val);
-        appendLi_City(val);
+        addArr_City(val); //await success from getWeather_geoFwd()
+        appendLi_City(val); //await success from getWeather_geoFwd()
         return getWeather_geoFwd(val);
+
     } else {
         return console.log("jData Cities is too long, or JDataCities already has the city name!");
     }
@@ -221,9 +286,16 @@ liCities.onclick = function(event) {
     let val;
     if (elm.nodeName === "LI") {
         val = document.querySelector("#" + elm.id).querySelector("a").textContent;
+
     } else if (elm.nodeName === "A") {
         const parent = elm.closest("li");
         val = parent.querySelector("a").textContent;
+    } else if (elm.nodeName === "I") {
+        const parent = elm.closest("li");
+        const id = parent.id.substring(3);
+        console.log(id);
+        removeArr_City(id);
+        return liCities.removeChild(parent);
     }
     if (val) { return getWeather_geoFwd(val); }
 }
@@ -238,36 +310,8 @@ getWeather_dataCoords()
     //add fallback --> does user want to give IP address instead? ipAPI()
 });
 
-getWeather_geoFwd("Cheb");
+//getWeather_geoFwd("Cheb");
 
 loadLi_Cities();
 
-
-
-/*  NOTE-ATO POTATO:
-
-    - When should getWeather_geoFwd() be called?
-        thinking --> When the user searches for a city in the query?
-
-    - When should the ipAPI be called?
-        + The user will click on a prompt, which will ask them for permission to use their IP address
-        + If the user gives permission, ipAPI() will get data.
-
-    - To use "in-house conversions" or not?
-        thinking(y) --> limit the # of calls to an API.
-                    --> if the in-house conversions are done on app, it would be more functional
-                    --> if done automatically, then values can be created automatically
-                    --> should I use object types?
-        thinking(n) --> calling and storing everything at once will reduce necessary calculations..
-    
-    - Concern: I cannot get city name from OpenWeather API call. Not good for geolocation
-               I can get city name from reverse geolocation, by entering it into the query
-               I can get city name from ip api
-
-    - What data should I save and store from the API? & what data should I display from the API?
-
-    - I should put:
-        + A refresh data button
-
-    - Need to go through the errors, at some point!
-*/
+updateP_statsStorage();
