@@ -4,65 +4,12 @@ const arrDefaultData = {
     arrCities: ["Prague", "Copenhagen"]
 };
 
-if (!localStorage.weatherDash || localStorage.weatherDash === "[]") {
-    localStorage.setItem("weatherDash", JSON.stringify(arrDefaultData));
+if (!localStorage.fetchTheWeather || localStorage.fetchTheWeather === "[]") {
+    localStorage.setItem("fetchTheWeather", JSON.stringify(arrDefaultData));
 }
 
-let appData = JSON.parse(localStorage.weatherDash);
+let appData = JSON.parse(localStorage.fetchTheWeather);
 /* END -- VARIABLE DECLARATIONS */
-
-
-/* START -- EVENT LISTENERS */
-const btnSubmit = document.querySelector('#search-bar button[type="submit"]');
-const inputSubmit = document.querySelector('#search-bar input[type="text"]');
-const liSavedCities = document.querySelector("#list-saved-cities");
-
-btnSubmit.onclick = function() {
-    let val = inputSubmit.value;
-        val = trimString(val);
-    
-    if (arrValidate_Length() && val.length > 0 && arrValidate_City(val) === false) {
-        
-        addCityToAppData(val); //await success from callPositionStackAPI()
-        appendCityToList(val); //await success from callPositionStackAPI()
-        
-        return callPositionStackAPI(val);
-
-    } else {
-
-        return handleErrors("appData is too long!");
-
-    }
-}
-
-inputSubmit.onkeypress = function(event) {
-    if (event.keyCode === 13) return btnSubmit.click(); 
-}
-
-liSavedCities.onclick = function(event) {
-    const elm = event.target;
-    let val;
-
-    if (elm.nodeName === "LI") {
-        return val = document.querySelector("#" + elm.id).querySelector("a").textContent;
-    
-    } else if (elm.nodeName === "A") {
-        const parent = elm.closest("li");
-        
-        return val = parent.querySelector("a").textContent;
-    
-    } else if (elm.nodeName === "I") {
-        const parent = elm.closest("li");
-        const id = parent.id.substring(3);
-
-        removeCityFromAppData(id);
-        
-        return liSavedCities.removeChild(parent);
-    }
-
-    if (val) return callPositionStackAPI(val);
-}
-/* END: EVENT LISTENERS */
 
 
 /* START -- DATA PERSISTENCE FUNCTIONS */
@@ -70,7 +17,7 @@ const addCityToAppData = (city) => {
     if (arrValidate_Length()) {
         appData.arrCities.push(city);
 
-        return localStorage.setItem("weatherDash", JSON.stringify(appData));
+        return localStorage.setItem("fetchTheWeather", JSON.stringify(appData));
     } else {
         return handleErrors("arr");
     }
@@ -83,7 +30,7 @@ const removeCityFromAppData = (name) => {
     
     appData.arrCities = arr.filter(item => item != name);
 
-    return localStorage.setItem("weatherDash", JSON.stringify(appData));
+    return localStorage.setItem("fetchTheWeather", JSON.stringify(appData));
 }
 
 const arrValidate_Length = () => {
@@ -152,35 +99,18 @@ const forwardResponseFromGeoLocation = () => {
 
 const renderResponse = (response) => {
     updateNumberOfCities();
-    
-    return appendWeatherDataToDOM(response); 
+
+    return appendToCurrentWeather(response); 
 };
 /* END -- API CALLS */
 
 
 /* START -- STRING FORMATTING FUNCTIONS */
-const handleErrors = (data) => {
-    console.log(data);
-    switch (data.code) {
-        case 2:
-            //geolocation cannot connect to internet
-            break;
-        case 401:
-            //invalid API key
-            break;
-        case typeof data === "string":
-            //message
-            break;
-        default:
-            break;
-    }
-};
-
 const trimString = (str) => {
     return str = str.trim();
 }
 
-const formatTimeString = (property, date) => {
+const formatTimeString = (date) => {
     let newDate = new Date(date*1000);
     let strTime = `${newDate.getHours()}.${newDate.getMinutes()}`;
 
@@ -196,67 +126,72 @@ const titleCaseString = (str) => {
     
     return temp.join(" ");
 }
+
+const convertUnderScoreToSpace = (str) => {
+    let temp = str.split("_");
+
+    return temp.join(" ");
+}
 /* END -- STRING FORMATTING FUNCTIONS */
 
 
 /* START -- DOM MANIPULATION */
-const appendWeatherDataToDOM = (data) => {
-    const ul_current = document.querySelector("#current-weather")
+const appendToCurrentWeather = (data) => {
+    const ul_current = document.querySelector("#current-weather");
+    let frag = document.createDocumentFragment();
+    
     const current = data.current;
     
+    clearCurrentWeather();
+
     for (let item in current) {
-        const property = item;
+        
+        let property = item;
         let content = current[item];
+        
+        if (property === "dt" || property === "weather") continue;
+        
+        let li = document.createElement('li');
+        let pData = document.createElement('p');
+        let pProp = document.createElement('p');
+
+        li.id = `current-${property}`;
+
+        pProp.textContent = convertUnderScoreToSpace(property);
+        
+        if (property != "uvi") pProp.textContent = titleCaseString(pProp.textContent);
+        else if (property === "uvi") pProp.textContent = pProp.textContent.toUpperCase();
 
         if (property === "sunrise" || property === "sunset") {
-            content = formatTimeString(property, content);
+            content = formatTimeString(content);
         }
-
+        
         if (typeof content === "number" || typeof content === "string") {
-            let p = ul_current.querySelector(`li.${property} p:first-of-type`);
-            
-            if (p) p.textContent = content;
+            pData.textContent = content;
         }
-
-        if (typeof content === "object" && property === "weather") {
-            const ul = ul_current.querySelector('li.weather ul');
-            
-            const li_main = document.createElement("li");
-            const li_desc = document.createElement("li"); 
-            
-            const p_main = document.createElement("p");
-            const p_desc = document.createElement("p");
-            
-            const str = `Description: `;
-            
-            li_main.textContent = str;
-            li_desc.textContent = str;
-
-            for (let index in content) {
-                const { main, description } = content[index];
-                
-                p_main.textContent += main;
-                p_desc.textContent += description;
-
-                if (content.indexOf(index) > -1 ||
-                    content.indexOf(index) >= content.length) {
-                    li_main.textContent += `, `;
-                    li_desc.textContent += `, `;
-                }
-
-                li_main.appendChild(p_main);
-                li_desc.appendChild(p_desc);
-            }
-            ul.appendChild(li_main);
-            ul.appendChild(li_desc);
-        }
+        
+        li.appendChild(pData);
+        li.appendChild(pProp);
+        
+        frag.appendChild(li);
     }
-
+    
+    return ul_current.appendChild(frag);
 }
 
-const appendCityToList = (data) => {
+const clearCurrentWeather = () => {
+    const ul_current = document.querySelector("#current-weather");
+    
+    while (ul_current.firstChild) {
+        ul_current.removeChild(ul_current.lastChild);
+    }
+
+    return ul_current;
+}
+
+const appendToListSavedCities = (data) => {
     const ul_savedCities = document.querySelector('#list-saved-cities');
-    const fragment = document.createDocumentFragment();
+    const frag = document.createDocumentFragment();
     
     const li = document.createElement("li");
     const a = document.createElement("a");
@@ -273,14 +208,14 @@ const appendCityToList = (data) => {
     li.appendChild(a);
     li.appendChild(i);
     
-    fragment.appendChild(li);
+    frag.appendChild(li);
     
-    return ul_savedCities.appendChild(fragment);
+    return ul_savedCities.appendChild(frag);
 }
 
 const loadCitiesToList = () => {
     appData.arrCities.forEach(data => {
-        return appendCityToList(data);
+        return appendToListSavedCities(data);
     });
 }
 
@@ -291,6 +226,81 @@ const updateNumberOfCities = () => {
     return p.textContent =  arr.length + " of 5 cities";
 }
 /* END -- DOM MANIPULATION */
+
+
+/* START -- EVENT LISTENERS */
+const btnSubmit = document.querySelector('#search-bar button[type="submit"]');
+btnSubmit.onclick = function() {
+    let val = inputSubmit.value;
+        val = trimString(val);
+    
+    if (arrValidate_Length() && val.length > 0 && arrValidate_City(val) === false) {
+        addCityToAppData(val); //await success from callPositionStackAPI()
+        appendToListSavedCities(val); //await success from callPositionStackAPI()
+        
+        return callPositionStackAPI(val);
+    } else {
+        return handleErrors("appData is too long!");
+    }
+}
+
+const inputSubmit = document.querySelector('#search-bar input[type="text"]');
+inputSubmit.onkeypress = function(event) {
+    if (event.keyCode === 13) return btnSubmit.click(); 
+}
+
+const liSavedCities = document.querySelector("#list-saved-cities");
+liSavedCities.onclick = function(event) {
+    const elm = event.target;
+    let val;
+    
+    switch(elm.nodeName) {
+        case "LI": {
+            val = document.querySelector("#" + elm.id).querySelector("a").textContent;
+            break;
+        }
+        case "A": {
+            const parent = elm.closest("li");
+            val = parent.querySelector("a").textContent;
+            break;
+        }
+        case "I": {
+            const parent = elm.closest("li");
+            const id = parent.id.substring(3);
+
+            removeCityFromAppData(id);
+            
+            liSavedCities.removeChild(parent);
+            break;
+        }
+        default: {
+            break;
+        }
+    }
+
+    if (val) return callPositionStackAPI(val);
+}
+/* END: EVENT LISTENERS */
+
+
+/* START -- ERROR HANDLER */
+const handleErrors = (data) => {
+    console.log(data);
+    switch (data.code) {
+        case 2:
+            //geolocation cannot connect to internet
+            break;
+        case 401:
+            //invalid API key
+            break;
+        case typeof data === "string":
+            //message
+            break;
+        default:
+            break;
+    }
+};
+/* END -- ERROR HANDLER */
 
 
 /* START -- SCRIPT INITIALIZATION */
