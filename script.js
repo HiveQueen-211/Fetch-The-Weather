@@ -48,63 +48,6 @@ const arrValidate_City = (city) => {
 /* END -- DATA PERSISTENCE FUNCTIONS */
 
 
-/* START -- API CALLS */
-const callOpenWeatherAPI = (latitude, longitude) => {
-    const apiKey = `afc3b45d0bea226dd7cffba0f8efb229`;
-    const unitFormat = `metric`;
-    const callURL = `https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&units=${unitFormat}&appid=${apiKey}`;
-    
-    return fetch(callURL)
-    .then(response => response.json())
-    .then(renderResponse)
-    .catch(err => { handleErrors(err) });
-}
-
-const callPositionStackAPI = (city) => { 
-    const apiKey = `74d5b9f01b4b1c640e8b2c7a401a3f33`;
-    const callURL = `http://api.positionstack.com/v1/forward?access_key=${apiKey}&query=${city}&limit=1`;
-    
-    return fetch(callURL)
-    .then(response => response.json())
-    .then(forwardResponseFromPositionStackAPI)
-    .catch(err => { handleErrors(err) });
-}
-
-const callIpAPI = () => {
-    const callURL = `http://ip-api.com/json/?fields=status,message,query,lat,lon`;
-    
-    return fetch(callURL)
-    .then(response => response.json())
-    .then(forwardData_ipAPI)
-    .catch(err => { handleErrors(err) });
-}
-
-const forwardResponseFromPositionStackAPI = (response) => {
-    let {latitude, longitude} = response.data[0];
-    
-    return callOpenWeatherAPI(latitude, longitude);
-}
-
-const forwardResponseFromIpAPI = (response) => {
-    let {lat, lon} = response;
-    
-    return callOpenWeatherAPI(lat, lon);
-}
-
-const forwardResponseFromGeoLocation = () => {
-    return new Promise(function(resolve, reject) {
-        navigator.geolocation.getCurrentPosition(resolve, reject);
-    });
-}
-
-const renderResponse = (response) => {
-    updateNumberOfCities();
-
-    return appendToCurrentWeather(response); 
-};
-/* END -- API CALLS */
-
-
 /* START -- STRING FORMATTING FUNCTIONS */
 const trimString = (str) => {
     return str = str.trim();
@@ -267,9 +210,7 @@ liSavedCities.onclick = function(event) {
         case "I": {
             const parent = elm.closest("li");
             const id = parent.id.substring(3);
-
             removeCityFromAppData(id);
-            
             liSavedCities.removeChild(parent);
             break;
         }
@@ -281,6 +222,63 @@ liSavedCities.onclick = function(event) {
     if (val) return callPositionStackAPI(val);
 }
 /* END: EVENT LISTENERS */
+
+
+/* START -- API CALLS */
+const callOpenWeatherAPI = (latitude, longitude) => {
+    const apiKey = `afc3b45d0bea226dd7cffba0f8efb229`;
+    const unitFormat = `metric`;
+    const callURL = `https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&units=${unitFormat}&appid=${apiKey}`;
+    
+    return fetch(callURL)
+    .then(response => response.json())
+    .then(renderResponse)
+    .catch(err => { handleErrors(err) });
+}
+
+const callPositionStackAPI = (city) => { 
+    const apiKey = `74d5b9f01b4b1c640e8b2c7a401a3f33`;
+    const callURL = `http://api.positionstack.com/v1/forward?access_key=${apiKey}&query=${city}&limit=1`;
+    
+    return fetch(callURL)
+    .then(response => response.json())
+    .then(forwardResponseFromPositionStackAPI)
+    .catch(err => { handleErrors(err) });
+}
+
+const callIpAPI = () => {
+    const callURL = `http://ip-api.com/json/?fields=status,message,query,lat,lon`;
+    
+    return fetch(callURL)
+    .then(response => response.json())
+    .then(forwardData_ipAPI)
+    .catch(err => { handleErrors(err) });
+}
+
+const forwardResponseFromPositionStackAPI = (response) => {
+    let {latitude, longitude} = response.data[0];
+    
+    return callOpenWeatherAPI(latitude, longitude);
+}
+
+const forwardResponseFromIpAPI = (response) => {
+    let {lat, lon} = response;
+    
+    return callOpenWeatherAPI(lat, lon);
+}
+
+const forwardResponseFromGeoLocation = () => {
+    return new Promise(function(resolve, reject) {
+        navigator.geolocation.getCurrentPosition(resolve, reject);
+    });
+}
+
+const renderResponse = (response) => {
+    updateNumberOfCities();
+
+    return appendToCurrentWeather(response); 
+};
+/* END -- API CALLS */
 
 
 /* START -- ERROR HANDLER */
@@ -309,7 +307,6 @@ forwardResponseFromGeoLocation()
     callOpenWeatherAPI(data.coords.latitude, data.coords.longitude) 
 }).catch((err) => {
     return handleErrors(err);
-    //add fallback --> does user want to give IP city instead? callIpAPI()
 });
 
 loadCitiesToList();
