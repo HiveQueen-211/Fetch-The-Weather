@@ -247,12 +247,15 @@ const callPositionStackAPI = (city) => {
 }
 
 const callIpAPI = () => {
-    const callURL = `http://ip-api.com/json/?fields=status,message,query,lat,lon`;
-    
-    return fetch(callURL)
-    .then(response => response.json())
-    .then(forwardData_ipAPI)
-    .catch(err => { handleErrors(err) });
+    if (confirm("Fetch The Weather with this device's IP address?")) {
+        const callURL = `http://ip-api.com/json/?fields=status,message,query,lat,lon`;
+        
+        return fetch(callURL)
+        .then(response => response.json())
+        .then(forwardResponseFromIpAPI)
+        .catch(err => { handleErrors(err) });
+    }
+    return;
 }
 
 const forwardResponseFromPositionStackAPI = (response) => {
@@ -283,8 +286,10 @@ const renderResponse = (response) => {
 
 /* START -- ERROR HANDLER */
 const handleErrors = (data) => {
-    console.log(data);
     switch (data.code) {
+        case 1:
+            callIpAPI();
+            break;
         case 2:
             //geolocation cannot connect to internet
             break;
@@ -295,6 +300,7 @@ const handleErrors = (data) => {
             //message
             break;
         default:
+            console.log(data);
             break;
     }
 };
