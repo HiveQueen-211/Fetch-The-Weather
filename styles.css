@@ -146,8 +146,12 @@ header i {
 }
 
 #main > * {
-    max-width: var(--width-wrapper);
+    width: var(--width-wrapper);
     margin: 0 auto;
+}
+
+#main #search-bar {
+    margin-bottom: 1em;
 }
 
 .ul-grid {

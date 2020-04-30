@@ -78,6 +78,27 @@ const convertUnderScoreToSpace = (str) => {
 /* END -- STRING FORMATTING FUNCTIONS */
 
 
+/* START -- UNIT CONVERSION FUNCTIONS */ 
+const convertToCelsius = (val) => {
+    const celsius = (val * (9 / 5)) + 32;
+    return celsius.toFixed(2);
+}
+
+const convertToFarenheit = (val) => {
+    const farenheit = (val - 32) * (5 / 9);
+    return farenheit.toFixed(2);
+}
+
+const convertTo12hr = (val) => {
+
+}
+
+const convertTo24hr = (val) => {
+
+}
+/* END -- UNIT CONVERSION FUNCTIONS */
+
+
 /* START -- DOM MANIPULATION */
 const appendToCurrentWeather = (data) => {
     const ul_current = document.querySelector("#current-weather");
@@ -220,7 +241,7 @@ const liSavedCities = document.querySelector("#list-saved-cities");
 liSavedCities.onclick = function(event) {
     const elm = event.target;
     let val;
-    
+
     switch(elm.nodeName) {
         case "LI": {
             val = document.querySelector("#" + elm.id).querySelector("a").textContent;
@@ -332,12 +353,12 @@ const handleErrors = (data) => {
 
 
 /* START -- SCRIPT INITIALIZATION */
-/*forwardResponseFromGeoLocation()
+forwardResponseFromGeoLocation()
 .then((data) => { 
     callOpenWeatherAPI(data.coords.latitude, data.coords.longitude) 
 }).catch((err) => {
     return handleErrors(err);
-});*/
+});
 
 loadCitiesToList();
 
