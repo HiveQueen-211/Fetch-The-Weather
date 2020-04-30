@@ -85,7 +85,7 @@ const appendToCurrentWeather = (data) => {
     
     const current = data.current;
     
-    clearCurrentWeather();
+    clearDOMCurrentWeather();
 
     for (let item in current) {
         
@@ -122,7 +122,7 @@ const appendToCurrentWeather = (data) => {
     return ul_current.appendChild(frag);
 }
 
-const clearCurrentWeather = () => {
+const clearDOMCurrentWeather = () => {
     const ul_current = document.querySelector("#current-weather");
     
     while (ul_current.firstChild) {
@@ -172,6 +172,30 @@ const updateNumberOfCities = () => {
 
 
 /* START -- EVENT LISTENERS */
+const iToggleMenu = document.querySelector('header i');
+const sectionMain = document.querySelector('#main');
+const sectionControls = document.querySelector('#container-controls');
+iToggleMenu.onclick = function() {
+    const strClass = 'open-menu';
+    const strVal = 'var(--width-container-controls)';
+
+    
+    if (sectionControls.classList.contains(strClass)) {    
+        sectionControls.style.left = "-20em";
+    } else {
+        sectionControls.style.left = 0;
+    }
+    
+    if (sectionMain.classList.contains(strClass)) {
+        sectionMain.style.marginLeft = 0;
+    } else {
+        sectionMain.style.marginLeft = strVal;
+    }
+
+    sectionControls.classList.toggle(strClass);
+    sectionMain.classList.toggle(strClass);
+}
+
 const btnSubmit = document.querySelector('#search-bar button[type="submit"]');
 btnSubmit.onclick = function() {
     let val = inputSubmit.value;
@@ -308,12 +332,12 @@ const handleErrors = (data) => {
 
 
 /* START -- SCRIPT INITIALIZATION */
-forwardResponseFromGeoLocation()
+/*forwardResponseFromGeoLocation()
 .then((data) => { 
     callOpenWeatherAPI(data.coords.latitude, data.coords.longitude) 
 }).catch((err) => {
     return handleErrors(err);
-});
+});*/
 
 loadCitiesToList();
 

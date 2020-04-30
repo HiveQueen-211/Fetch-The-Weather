@@ -1,9 +1,9 @@
 @import url('https://fonts.googleapis.com/css?family=Varela+Round&display=swap');
 :root {
-    --wrapper-width: 36rem;
-    --tab-width: 15rem;
+    --width-wrapper: 42rem;
+    --width-tab: 15rem;
     --width-container-controls: 20em;
-    --tab-height: 4rem;
+    --height-tab: 4rem;
     --height-elm-control: 3em;
 
     --font-family: "Varela Round", sans-serif;
@@ -17,7 +17,7 @@
 
 * { box-sizing: border-box; }
 html { font-size: 20px; font-family: var(--font-family); }
-body { margin: 0; }
+body { margin: 0; display: flex; overflow-x: hidden; }
 
 ul { padding-inline-start: 0; list-style: none; }
 
@@ -34,25 +34,44 @@ button {
 
 /* element styling */
 
+
+header,
 #container-controls,
-#container-tab-weather { /* elms with wrapper-container behavior */
+#main {
     display: flex;
     flex-flow: row wrap;
-    width: var(--wrapper-width);
+    width: var(--width-wrapper);
     margin: 1em auto;
     height: fit-content;
 }
 
+header {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    align-items: center;
+    margin: 0;
+}
+header i {
+    position: absolute;
+    right: 0;
+    font-size: 1.5em;
+    cursor: pointer;
+}
+
 #container-controls {
+    display: flex;
     position: fixed;
     align-content: flex-start;
     height: calc(100vh);
     width: var(--width-container-controls);
     top: 0;
+    left: -20em;
     margin: 0;
     padding: .5em;
     background-color: #fff;
     box-shadow: var(--box-shadow);
+    transition: left .5s;
 }
 
 #container-controls h3 { margin-bottom: 0; }
@@ -67,21 +86,25 @@ button {
 #container-controls .switch input[type="checkbox"] { display: none; }
 
 #container-controls ul { width: 100%; }
-#container-controls ul li,
-#container-controls ul li a { display: block; cursor: pointer; }
-#container-controls ul li a {
-    padding: .5em 0;
+
+#list-fetch-methods { 
+    display: flex;
+    align-content: flex-start; 
+    width: 100%;
 }
-
-#list-fetch-methods { display: flex; }
-
-#list-fetch-methods li { width: 50%; margin-right: .5em; }
+#list-fetch-methods li { margin-right: .5em; }
 #list-fetch-methods li:last-child { margin-right: 0;}
-#list-fetch-methods li button { width: 100%; }
-
-#list-saved-cities {
-
+#list-fetch-methods li button { 
+    width: fit-content;
+    height: 2em;
+    padding: 0 .7em; 
 }
+
+#list-saved-cities li { display: flex; align-items: center; }
+#list-saved-cities li,
+#list-saved-cities li a { cursor: pointer; }
+#list-saved-cities li a { padding: .5em; }
+#list-saved-cities li i { position: absolute; right: 1em; }
 
 #search-bar { 
     display: flex; 
@@ -103,7 +126,6 @@ button {
     box-shadow: var(--box-input-glow); 
 }
 
-
 #container-controls #stats-storage {
     display: flex;
     width: 100%;
@@ -113,12 +135,19 @@ button {
     bottom: 0;
 }
 
-#container-tab-weather {
-    position: absolute; 
+#main {
+    position: relative;
     flex-flow: column wrap;
-    width: calc( 100% - var(--width-container-controls) );
-    margin-left: var(--width-container-controls);
     padding: 0 2em;
+    width: 100%;    
+    left: 0;
+    margin-left: 0;
+    transition: margin-left .5s;
+}
+
+#main > * {
+    max-width: var(--width-wrapper);
+    margin: 0 auto;
 }
 
 .ul-grid {
@@ -128,7 +157,6 @@ button {
     grid-auto-rows: 7em;
 
 }
-
 .ul-grid li {
     display: flex;
     flex-flow: column wrap;
