@@ -8,7 +8,8 @@
 </head>
 <body>
 
-    <section id="container-controls">
+    <aside id="container-controls">
+        <i class="fas fa-times i-close"></i>
         <section id="dropdown-units" class="switch">
             <input type="checkbox" name="" id="unit-sys">
             <label for="unit-sys"></label>
@@ -26,9 +27,12 @@
         <ul id="list-saved-cities">
         </ul>
         <p id="stats-storage">0 of 5 cities</p>
-    </section>
+    </aside>
     
-    <section id="main">
+    <main id="main">
+        <section id="error-bar">
+            <p></p>
+        </section>
 
         <header>
             <h1>Fetch The Weather</h1>
@@ -43,7 +47,7 @@
         <ul id="current-weather" class="ul-grid">
         </ul>
 
-    </section>
+    </main>
         
 
     <footer><p>Powered by OpenWeather API</p></footer>

@@ -45,20 +45,6 @@ header,
     height: fit-content;
 }
 
-header {
-    width: 100%;
-    overflow: hidden;
-    position: relative;
-    align-items: center;
-    margin: 0;
-}
-header i {
-    position: absolute;
-    right: 0;
-    font-size: 1.5em;
-    cursor: pointer;
-}
-
 #container-controls {
     display: flex;
     position: fixed;
@@ -71,7 +57,16 @@ header i {
     padding: .5em;
     background-color: #fff;
     box-shadow: var(--box-shadow);
-    transition: left .5s;
+    z-index: 5;
+}
+#container-controls.open-menu {
+    left: 0;
+}
+
+#container-controls .i-close {
+    position: absolute;
+    right: 1em;
+    top: .5em;
 }
 
 #container-controls h3 { margin-bottom: 0; }
@@ -106,10 +101,65 @@ header i {
 #list-saved-cities li a { padding: .5em; }
 #list-saved-cities li i { position: absolute; right: 1em; }
 
+
+#main {
+    position: relative;
+    flex-flow: column wrap;
+    padding: 0 2em;
+    width: 100%;
+    margin-left: 0;
+}
+#main.open-menu {
+    margin-left: var(--width-container-controls);
+}
+
+#main > * {
+    width: var(--width-wrapper);
+    margin: 0 auto;
+}
+@media only screen and (max-width: 1325px) {
+    #main.open-menu > * {
+        width: 100%;
+    }
+}
+@media only screen and (max-width: 930px) {
+    #main > * {
+        width: 100%;
+    }
+}
+@media only screen and (max-width: 876px) {
+    #main.open-menu #search-bar button[type="submit"] {
+        width: 100%;
+    }
+}
+@media only screen and (max-width: 840px) {
+    #container-controls {
+        width: 100%;
+        left: calc(100%);
+    }
+}
+
+#main #search-bar {
+    margin-bottom: 1em;
+}
+
+header {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    align-items: center;
+    margin: 0;
+}
+header > * { font-size: 1.5em; }
+header i {
+    position: absolute;
+    right: 0;
+    cursor: pointer;
+}
+
 #search-bar { 
     display: flex; 
     flex-flow: row wrap; 
-    width: 100%;
     box-shadow: var(--box-shadow);
 }
 #search-bar > * {
@@ -120,6 +170,7 @@ header i {
     flex-grow: 1; 
     font-size: 1em;
     border: none;
+    height: 60px;
 }
 #search-bar input[type="text"]:focus { 
     outline: .1em solid var(--rgba-input-outline); 
@@ -133,25 +184,6 @@ header i {
     align-self: flex-end;
     position: absolute;
     bottom: 0;
-}
-
-#main {
-    position: relative;
-    flex-flow: column wrap;
-    padding: 0 2em;
-    width: 100%;    
-    left: 0;
-    margin-left: 0;
-    transition: margin-left .5s;
-}
-
-#main > * {
-    width: var(--width-wrapper);
-    margin: 0 auto;
-}
-
-#main #search-bar {
-    margin-bottom: 1em;
 }
 
 .ul-grid {

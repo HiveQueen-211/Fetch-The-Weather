@@ -215,32 +215,51 @@ const updateNumberOfCities = () => {
 
     return p.textContent =  arr.length + " of 5 cities";
 }
+
+const showError = (msg) => {
+    
+}
 /* END -- DOM MANIPULATION */
 
 
 /* START -- EVENT LISTENERS */
-const iToggleMenu = document.querySelector('header i');
+let winWidth;
+window.addEventListener("resize", function() {
+    winWidth = document.documentElement.clientWidth;
+});
+
 const sectionMain = document.querySelector('#main');
 const sectionControls = document.querySelector('#container-controls');
+
+const iToggleMenu = document.querySelector('header i');
 iToggleMenu.onclick = function() {
     const strClass = 'open-menu';
-    const strVal = 'var(--width-container-controls)';
-
-    
-    if (sectionControls.classList.contains(strClass)) {    
-        sectionControls.style.left = "-20em";
-    } else {
-        sectionControls.style.left = 0;
-    }
-    
-    if (sectionMain.classList.contains(strClass)) {
-        sectionMain.style.marginLeft = 0;
-    } else {
-        sectionMain.style.marginLeft = strVal;
-    }
 
     sectionControls.classList.toggle(strClass);
     sectionMain.classList.toggle(strClass);
+    
+    /*if (sectionControls.classList.contains(strClass)) {    
+        sectionControls.style.left = 0;
+    } else {
+        if (winWidth > "840") sectionControls.style.left = "-20em";
+    }
+    
+    if (sectionMain.classList.contains(strClass)) {
+        sectionMain.style.marginLeft = strVal;
+    } else {
+        sectionMain.style.marginLeft = "0";
+    } */
+}
+
+const iCloseMenu = document.querySelector('#container-controls .i-close');
+iCloseMenu.onclick = function() {
+    const strClass = 'open-menu';
+
+    sectionControls.classList.remove(strClass);
+    sectionMain.classList.remove(strClass);
+
+    /*sectionControls.style.left = "-20em";
+    sectionMain.style.marginLeft = "0";*/
 }
 
 const btnSubmit = document.querySelector('#search-bar button[type="submit"]');
@@ -379,12 +398,12 @@ const handleErrors = (data) => {
 
 
 /* START -- SCRIPT INITIALIZATION */
-forwardResponseFromGeoLocation()
+/*forwardResponseFromGeoLocation()
 .then((data) => { 
     callOpenWeatherAPI(data.coords.latitude, data.coords.longitude) 
 }).catch((err) => {
     return handleErrors(err);
-});
+});*/
 
 loadCitiesToList();
 
