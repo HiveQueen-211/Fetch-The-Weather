@@ -90,11 +90,37 @@ const convertToFarenheit = (val) => {
 }
 
 const convertTo12hr = (val) => {
+    let time = val.split(".");
+    let hour = parseInt(time[0]);
+    let minute = time[1];
+    let period;
 
+    if (hour <= 12) period = "am";
+    
+    if (hour > 12) {
+        hour = hour - 12;
+        period = "pm";
+    }
+    
+    return time = hour + ":" +  minute + period;
 }
 
 const convertTo24hr = (val) => {
+    const period = val.slice(-2);
+    let time = val.split(":");
+    let hour = parseInt(time[0]);
 
+    
+    if (hour < 10 && period === "am") hour = 0 + hour;
+    
+    if (hour === 12 && period === "am") hour = "00";
+
+    if (period == "pm") hour = hour + 12;
+
+    time[0] = hour;
+    time[1] = time[1].slice(0, 2);
+    
+    return time = time.join(".");
 }
 /* END -- UNIT CONVERSION FUNCTIONS */
 
