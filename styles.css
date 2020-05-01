@@ -9,6 +9,7 @@
     --font-family: "Varela Round", sans-serif;
     --rgba-shadow: rgba(216, 216, 216, .9);
     --rgba-input-outline: rgba(71, 160, 204, 1);
+    --rgba-red: rgba(237, 73, 40, 1);
     --box-shadow: 0px 3px 7px var(--rgba-shadow);
     --box-input-glow: 0px 3px 7px var(--rgba-input-outline);
 }
@@ -29,12 +30,7 @@ button {
     height: var(--height-elm-control);
 }
 
-/* icon resets */
-#dropdown-units .fa-sort-down { position: relative; bottom: 2px; }
-
 /* element styling */
-
-
 header,
 #container-controls,
 #main {
@@ -82,31 +78,31 @@ header,
 
 #container-controls ul { width: 100%; }
 
-#list-fetch-methods { 
+#container-controls #list-fetch-methods { 
     display: flex;
     align-content: flex-start; 
     width: 100%;
 }
-#list-fetch-methods li { margin-right: .5em; }
-#list-fetch-methods li:last-child { margin-right: 0;}
-#list-fetch-methods li button { 
+#container-controls #list-fetch-methods li { margin-right: .5em; }
+#container-controls #list-fetch-methods li:last-child { margin-right: 0;}
+#container-controls #list-fetch-methods li button { 
     width: fit-content;
     height: 2em;
     padding: 0 .7em; 
 }
 
-#list-saved-cities li { display: flex; align-items: center; }
-#list-saved-cities li,
-#list-saved-cities li a { cursor: pointer; }
-#list-saved-cities li a { padding: .5em; }
-#list-saved-cities li i { position: absolute; right: 1em; }
+#container-controls #list-saved-cities li { display: flex; align-items: center; }
+#container-controls #list-saved-cities li,
+#container-controls #list-saved-cities li a { cursor: pointer; }
+#container-controls #list-saved-cities li a { padding: .5em; }
+#container-controls #list-saved-cities li i { position: absolute; right: 1em; }
 
 
 #main {
     position: relative;
     flex-flow: column wrap;
-    padding: 0 2em;
     width: 100%;
+    margin-top: 0;
     margin-left: 0;
 }
 #main.open-menu {
@@ -117,26 +113,15 @@ header,
     width: var(--width-wrapper);
     margin: 0 auto;
 }
-@media only screen and (max-width: 1325px) {
-    #main.open-menu > * {
-        width: 100%;
-    }
-}
-@media only screen and (max-width: 930px) {
-    #main > * {
-        width: 100%;
-    }
-}
-@media only screen and (max-width: 876px) {
-    #main.open-menu #search-bar button[type="submit"] {
-        width: 100%;
-    }
-}
-@media only screen and (max-width: 840px) {
-    #container-controls {
-        width: 100%;
-        left: calc(100%);
-    }
+
+#main #error-bar {
+    width: 100%;
+    margin: 0;
+    background-color: var(--rgba-red);
+    color: #fff;
+    text-align: center;
+    font-weight: bold;
+    opacity: 0;
 }
 
 #main #search-bar {
@@ -208,4 +193,26 @@ footer {
     width: 100%;
     padding: 2em;
     text-align: center;
+}
+
+@media only screen and (max-width: 1325px) {
+    #main.open-menu > * {
+        width: 90%;
+    }
+}
+@media only screen and (max-width: 930px) {
+    #main > * {
+        width: 90%;
+    }
+}
+@media only screen and (max-width: 876px) {
+    #main.open-menu #search-bar button[type="submit"] {
+        width: 100%;
+    }
+}
+@media only screen and (max-width: 840px) {
+    #container-controls {
+        width: 100%;
+        left: calc(100%);
+    }
 }

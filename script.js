@@ -216,8 +216,17 @@ const updateNumberOfCities = () => {
     return p.textContent =  arr.length + " of 5 cities";
 }
 
-const showError = (msg) => {
-    
+const showError = (msg, errorCode = "") => {
+    //const elmErrorBar = document.querySelector('#error-bar');
+    const pErrorBar = elmErrorBar.querySelector('p');
+
+    if (errorCode) {
+        pErrorBar.textContent = `Error ${errorCode}: ${msg}`;
+    } else {
+        pErrorBar.textContent = `Error: ${msg}`;
+    }
+
+    return elmErrorBar.style.opacity = 1;
 }
 /* END -- DOM MANIPULATION */
 
@@ -228,6 +237,13 @@ window.addEventListener("resize", function() {
     winWidth = document.documentElement.clientWidth;
 });
 
+const elmErrorBar = document.querySelector('#error-bar');
+elmErrorBar.onclick = function() {
+    if (elmErrorBar.style.opacity = 1) {
+        elmErrorBar.style.opacity = 0; 
+    }
+}
+
 const sectionMain = document.querySelector('#main');
 const sectionControls = document.querySelector('#container-controls');
 
@@ -237,18 +253,6 @@ iToggleMenu.onclick = function() {
 
     sectionControls.classList.toggle(strClass);
     sectionMain.classList.toggle(strClass);
-    
-    /*if (sectionControls.classList.contains(strClass)) {    
-        sectionControls.style.left = 0;
-    } else {
-        if (winWidth > "840") sectionControls.style.left = "-20em";
-    }
-    
-    if (sectionMain.classList.contains(strClass)) {
-        sectionMain.style.marginLeft = strVal;
-    } else {
-        sectionMain.style.marginLeft = "0";
-    } */
 }
 
 const iCloseMenu = document.querySelector('#container-controls .i-close');
@@ -257,9 +261,6 @@ iCloseMenu.onclick = function() {
 
     sectionControls.classList.remove(strClass);
     sectionMain.classList.remove(strClass);
-
-    /*sectionControls.style.left = "-20em";
-    sectionMain.style.marginLeft = "0";*/
 }
 
 const btnSubmit = document.querySelector('#search-bar button[type="submit"]');
@@ -381,6 +382,7 @@ const handleErrors = (data) => {
             callIpAPI();
             break;
         case 2:
+            showError("Geolocation cannot connect to the internet");
             //geolocation cannot connect to internet
             break;
         case 401:
