@@ -1,7 +1,7 @@
 /* START -- VARIABLE DECLARATIONS */
 const arrDefaultData = {
-    defaultUnit: "metric",
-    arrCities: ["Prague", "Copenhagen"]
+    settings: { temperature: "metric", timeStandard: 24 }, 
+    cities: [ "Prague", "Copenhagen" ]
 };
 
 if (!localStorage.fetchTheWeather || localStorage.fetchTheWeather === "[]") {
@@ -9,13 +9,14 @@ if (!localStorage.fetchTheWeather || localStorage.fetchTheWeather === "[]") {
 }
 
 let appData = JSON.parse(localStorage.fetchTheWeather);
+
 /* END -- VARIABLE DECLARATIONS */
 
 
 /* START -- DATA PERSISTENCE FUNCTIONS */
 const addCityToAppData = (city) => {
     if (arrValidate_Length()) {
-        appData.arrCities.push(city);
+        appData.cities.push(city);
 
         return localStorage.setItem("fetchTheWeather", JSON.stringify(appData));
     } else {
@@ -24,23 +25,23 @@ const addCityToAppData = (city) => {
 }
 
 const removeCityFromAppData = (name) => {
-    const arr = appData.arrCities;
+    const arr = appData.cities;
     
     name = titleCaseString(name);
     
-    appData.arrCities = arr.filter(item => item != name);
+    appData.cities = arr.filter(item => item != name);
 
     return localStorage.setItem("fetchTheWeather", JSON.stringify(appData));
 }
 
 const arrValidate_Length = () => {
-    const bool = (appData.arrCities.length < 5);
+    const bool = (appData.cities.length < 5);
     
     return bool;
 }
 
 const arrValidate_City = (city) => {
-    const arr = appData.arrCities;
+    const arr = appData.cities;
     const bool = arr.includes(city);
     
     return bool;
@@ -53,9 +54,13 @@ const trimString = (str) => {
     return str = str.trim();
 }
 
-const formatTimeString = (date) => {
+const formatIncomingTimeString = (date) => {
     let newDate = new Date(date*1000);
-    let strTime = `${newDate.getHours()}.${newDate.getMinutes()}`;
+    let hours = newDate.getHours().toString();
+
+    if (hours.length === 1) hours = `0${hours}`;
+
+    let strTime = `${hours}.${newDate.getMinutes()}`;
 
     return strTime;
 }
@@ -89,6 +94,8 @@ const convertToFarenheit = (val) => {
     return farenheit.toFixed(2);
 }
 
+
+
 const convertTo12hr = (val) => {
     let time = val.split(".");
     let hour = parseInt(time[0]);
@@ -111,7 +118,7 @@ const convertTo24hr = (val) => {
     let hour = parseInt(time[0]);
 
     
-    if (hour < 10 && period === "am") hour = 0 + hour;
+    if (hour < 10 && period === "am") hour = `0${hour}`;
     
     if (hour === 12 && period === "am") hour = "00";
 
@@ -135,7 +142,8 @@ const appendToCurrentWeather = (data) => {
     clearDOMCurrentWeather();
 
     for (let item in current) {
-        
+        const timeStandard = appData.settings.timeStandard;
+
         let property = item;
         let content = current[item];
         
@@ -153,7 +161,12 @@ const appendToCurrentWeather = (data) => {
         else if (property === "uvi") pProp.textContent = pProp.textContent.toUpperCase();
 
         if (property === "sunrise" || property === "sunset") {
-            content = formatTimeString(content);
+            if (timeStandard === 12) {
+                content = formatIncomingTimeString(content);
+                content = convertTo12hr(content);
+            } else if (timeStandard === 24) {
+                content = formatIncomingTimeString(content);
+            }
         }
         
         if (typeof content === "number" || typeof content === "string") {
@@ -204,20 +217,48 @@ const appendToListSavedCities = (data) => {
 }
 
 const loadCitiesToList = () => {
-    appData.arrCities.forEach(data => {
+    appData.cities.forEach(data => {
         return appendToListSavedCities(data);
     });
 }
 
 const updateNumberOfCities = () => {
-    const arr = appData.arrCities;
+    const arr = appData.cities;
     const p = document.querySelector('p#stats-storage');
 
     return p.textContent =  arr.length + " of 5 cities";
 }
 
+const updateCheckTimeUnit = () => {
+    const timeStandard = appData.settings.timeStandard;
+
+    if (timeStandard === 24) {
+        checkTimeUnit.checked = true;
+    } else {
+        checkTimeUnit.checked = false;
+    }
+
+    return timeStandard;
+}
+
+const updateTimeListItems = () => {
+    const timeStandard = appData.settings.timeStandard;
+    const arrIDs = ['#current-sunrise', '#current-sunset'];
+
+    for (let i = 0; i < arrIDs.length; i++) {
+        let li = document.querySelector(arrIDs[i]);
+        let p = li.querySelector('p');
+        
+        if (timeStandard === 12) {
+            p.textContent = convertTo12hr(p.textContent);
+        } else if (timeStandard === 24) {
+            p.textContent = convertTo24hr(p.textContent);
+        }
+    }
+}
+
 const showError = (msg, errorCode = "") => {
-    //const elmErrorBar = document.querySelector('#error-bar');
+    const elmErrorBar = document.querySelector('#error-bar');
     const pErrorBar = elmErrorBar.querySelector('p');
 
     if (errorCode) {
@@ -232,11 +273,6 @@ const showError = (msg, errorCode = "") => {
 
 
 /* START -- EVENT LISTENERS */
-let winWidth;
-window.addEventListener("resize", function() {
-    winWidth = document.documentElement.clientWidth;
-});
-
 const elmErrorBar = document.querySelector('#error-bar');
 elmErrorBar.onclick = function() {
     if (elmErrorBar.style.opacity = 1) {
@@ -244,24 +280,43 @@ elmErrorBar.onclick = function() {
     }
 }
 
-const sectionMain = document.querySelector('#main');
-const sectionControls = document.querySelector('#container-controls');
-
 const iToggleMenu = document.querySelector('header i');
 iToggleMenu.onclick = function() {
     const strClass = 'open-menu';
-
-    sectionControls.classList.toggle(strClass);
+    
     sectionMain.classList.toggle(strClass);
+    sectionControls.classList.toggle(strClass);
 }
 
 const iCloseMenu = document.querySelector('#container-controls .i-close');
 iCloseMenu.onclick = function() {
     const strClass = 'open-menu';
-
-    sectionControls.classList.remove(strClass);
+    
     sectionMain.classList.remove(strClass);
+    sectionControls.classList.remove(strClass);
 }
+
+const sectionMain = document.querySelector('#main');
+const sectionControls = document.querySelector('#container-controls');
+
+const checkTimeUnit = document.querySelector('#unit-time');
+checkTimeUnit.onclick = function() {
+    const checked = checkTimeUnit.checked;
+
+    if (checked) {
+        appData.settings.timeStandard = 24;
+        localStorage.setItem("fetchTheWeather", JSON.stringify(appData));
+        
+        return updateTimeListItems();
+    } else if (!checked) {
+        appData.settings.timeStandard = 12;
+        localStorage.setItem("fetchTheWeather", JSON.stringify(appData));
+
+        return updateTimeListItems();
+
+    }
+}
+
 
 const btnSubmit = document.querySelector('#search-bar button[type="submit"]');
 btnSubmit.onclick = function() {
@@ -406,6 +461,7 @@ forwardResponseFromGeoLocation()
     return handleErrors(err);
 });
 
-loadCitiesToList();
+updateCheckTimeUnit();
 
+loadCitiesToList();
 updateNumberOfCities();

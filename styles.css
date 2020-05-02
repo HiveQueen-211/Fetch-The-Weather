@@ -71,10 +71,10 @@ header,
     margin-bottom: .75em;
 }
 
-#container-controls .switch { display: none; }
+#container-controls .switch { display: flex; }
 #container-controls .switch { width: 50%; height: var(--height-elm-control); }
 #container-controls .switch > * { width: 100%; }
-#container-controls .switch input[type="checkbox"] { display: none; }
+#container-controls .switch input[type="checkbox"] { display: flex; }
 
 #container-controls ul { width: 100%; }
 
