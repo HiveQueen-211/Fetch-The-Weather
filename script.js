@@ -221,9 +221,9 @@ const showError = (msg, errorCode = "") => {
     const pErrorBar = elmErrorBar.querySelector('p');
 
     if (errorCode) {
-        pErrorBar.textContent = `Error ${errorCode}: ${msg}`;
+        pErrorBar.textContent = `ERROR ${errorCode}: ${msg}`;
     } else {
-        pErrorBar.textContent = `Error: ${msg}`;
+        pErrorBar.textContent = `ERROR: ${msg}`;
     }
 
     return elmErrorBar.style.opacity = 1;
@@ -382,17 +382,16 @@ const handleErrors = (data) => {
             callIpAPI();
             break;
         case 2:
-            showError("Geolocation cannot connect to the internet");
-            //geolocation cannot connect to internet
+            showError("Geolocation cannot connect to the internet", data.code);
             break;
         case 401:
-            //invalid API key
+            showError("Invalid API Key", data.code);
             break;
         case typeof data === "string":
-            //message
+            showError(data);
             break;
         default:
-            console.log(data);
+            showError("Something went wrong");
             break;
     }
 };
@@ -400,12 +399,12 @@ const handleErrors = (data) => {
 
 
 /* START -- SCRIPT INITIALIZATION */
-/*forwardResponseFromGeoLocation()
+forwardResponseFromGeoLocation()
 .then((data) => { 
     callOpenWeatherAPI(data.coords.latitude, data.coords.longitude) 
 }).catch((err) => {
     return handleErrors(err);
-});*/
+});
 
 loadCitiesToList();
 
