@@ -136,7 +136,7 @@ header {
     margin: 0;
 }
 header > * { font-size: 1.5em; }
-header i {
+header i#toggle-aside {
     position: absolute;
     right: 0;
     cursor: pointer;

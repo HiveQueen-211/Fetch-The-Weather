@@ -280,12 +280,12 @@ elmErrorBar.onclick = function() {
     }
 }
 
-const iToggleMenu = document.querySelector('header i');
+const iToggleMenu = document.querySelector('#toggle-aside');
 iToggleMenu.onclick = function() {
     const strClass = 'open-menu';
     
     sectionMain.classList.toggle(strClass);
-    sectionControls.classList.toggle(strClass);
+    asideControls.classList.toggle(strClass);
 }
 
 const iCloseMenu = document.querySelector('#container-controls .i-close');
@@ -293,11 +293,11 @@ iCloseMenu.onclick = function() {
     const strClass = 'open-menu';
     
     sectionMain.classList.remove(strClass);
-    sectionControls.classList.remove(strClass);
+    asideControls.classList.remove(strClass);
 }
 
 const sectionMain = document.querySelector('#main');
-const sectionControls = document.querySelector('#container-controls');
+const asideControls = document.querySelector('#container-controls');
 
 const checkTimeUnit = document.querySelector('#unit-time');
 checkTimeUnit.onclick = function() {
