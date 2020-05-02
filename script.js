@@ -1,6 +1,6 @@
 /* START -- VARIABLE DECLARATIONS */
 const arrDefaultData = {
-    settings: { temperature: "metric", timeStandard: 24 }, 
+    settings: { temperature: "celsius", timeStandard: 24 }, 
     cities: [ "Prague", "Copenhagen" ]
 };
 
@@ -9,6 +9,17 @@ if (!localStorage.fetchTheWeather || localStorage.fetchTheWeather === "[]") {
 }
 
 let appData = JSON.parse(localStorage.fetchTheWeather);
+
+const tempData = {
+    celsius: {
+        temp: "",
+        feels_like: ""
+    },
+    farenheit: {
+        temp: "",
+        feels_like: ""
+    }
+}
 
 /* END -- VARIABLE DECLARATIONS */
 
@@ -94,8 +105,6 @@ const convertToFarenheit = (val) => {
     return farenheit.toFixed(2);
 }
 
-
-
 const convertTo12hr = (val) => {
     let time = val.split(".");
     let hour = parseInt(time[0]);
@@ -138,11 +147,12 @@ const appendToCurrentWeather = (data) => {
     let frag = document.createDocumentFragment();
     
     const current = data.current;
-    
+    const timeStandard = appData.settings.timeStandard;
+    const tempUnit = appData.settings.temperature;
+
     clearDOMCurrentWeather();
 
     for (let item in current) {
-        const timeStandard = appData.settings.timeStandard;
 
         let property = item;
         let content = current[item];
@@ -156,7 +166,27 @@ const appendToCurrentWeather = (data) => {
         li.id = `current-${property}`;
 
         pProp.textContent = convertUnderScoreToSpace(property);
-        
+
+        if (property === "temp") {
+            tempData.celsius.temp = content;
+            tempData.farenheit.temp = convertToFarenheit(content);
+        }
+
+        if (property === "feels_like") {
+            tempData.celsius.feels_like = content;
+            tempData.farenheit.feels_like = convertToFarenheit(content);
+        }
+
+        if (tempUnit === "farenheit") {
+            const farenheit = tempData.farenheit;
+
+            for (let prop in farenheit) {
+                if (prop === property) {
+                    content = farenheit[prop];
+                }
+            }
+        }
+
         if (property != "uvi") pProp.textContent = titleCaseString(pProp.textContent);
         else if (property === "uvi") pProp.textContent = pProp.textContent.toUpperCase();
 
@@ -241,6 +271,46 @@ const updateCheckTimeUnit = () => {
     return timeStandard;
 }
 
+const updateCheckTempUnit = () => {
+    const tempUnit = appData.settings.temperature;
+
+    if (tempUnit === "farenheit") {
+        checkTempUnit.checked = true;
+    } else {
+        checkTempUnit.checked = false;
+    }
+
+    return tempUnit;
+}
+
+const updateTempListItems = () => {
+    const tempStandard = appData.settings.temperature;
+    const arrIDs = ['#current-temp', '#current-feels_like'];
+
+    for (let i = 0; i < arrIDs.length; i++) {
+        let li = document.querySelector(arrIDs[i]);
+        let p = li.querySelector('p');        
+        let property = arrIDs[i].substring(9);
+
+        if (tempStandard === "celsius") {
+            const dataCelsius = tempData.celsius; 
+            for (let data in dataCelsius) {
+                if (data === property) {
+                    p.textContent = dataCelsius[data];
+                }
+            }
+        } else if (tempStandard === "farenheit") {
+            const dataFarenheit = tempData.farenheit;
+
+            for (let data in dataFarenheit) {
+                if (data === property) {
+                    p.textContent = dataFarenheit[data];
+                }
+            }
+        }
+    }
+}
+
 const updateTimeListItems = () => {
     const timeStandard = appData.settings.timeStandard;
     const arrIDs = ['#current-sunrise', '#current-sunset'];
@@ -299,6 +369,23 @@ iCloseMenu.onclick = function() {
 const sectionMain = document.querySelector('#main');
 const asideControls = document.querySelector('#container-controls');
 
+const checkTempUnit = document.querySelector('#unit-temp');
+checkTempUnit.onclick = function() {
+    const checked = checkTempUnit.checked;
+
+    if (checked) {
+        appData.settings.temperature = "farenheit";
+        localStorage.setItem("fetchTheWeather", JSON.stringify(appData));
+
+        return updateTempListItems();
+    } else if (!checked) {
+        appData.settings.temperature = "celsius";
+        localStorage.setItem("fetchTheWeather", JSON.stringify(appData));
+        
+        return updateTempListItems();
+    }
+}
+
 const checkTimeUnit = document.querySelector('#unit-time');
 checkTimeUnit.onclick = function() {
     const checked = checkTimeUnit.checked;
@@ -313,7 +400,6 @@ checkTimeUnit.onclick = function() {
         localStorage.setItem("fetchTheWeather", JSON.stringify(appData));
 
         return updateTimeListItems();
-
     }
 }
 
@@ -462,6 +548,7 @@ forwardResponseFromGeoLocation()
 });
 
 updateCheckTimeUnit();
+updateCheckTempUnit();
 
 loadCitiesToList();
 updateNumberOfCities();
