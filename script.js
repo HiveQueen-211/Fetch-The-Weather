@@ -10,7 +10,8 @@ if (!localStorage.fetchTheWeather || localStorage.fetchTheWeather === "[]") {
 
 let appData = JSON.parse(localStorage.fetchTheWeather);
 
-const tempData = {
+const sessionData = {
+    currentLocation: "",
     celsius: {
         temp: "",
         feels_like: ""
@@ -26,7 +27,7 @@ const tempData = {
 
 /* START -- DATA PERSISTENCE FUNCTIONS */
 const addCityToAppData = (city) => {
-    if (arrValidate_Length()) {
+    if (isArrCitiesLessThanMax()) {
         appData.cities.push(city);
 
         return localStorage.setItem("fetchTheWeather", JSON.stringify(appData));
@@ -45,13 +46,13 @@ const removeCityFromAppData = (name) => {
     return localStorage.setItem("fetchTheWeather", JSON.stringify(appData));
 }
 
-const arrValidate_Length = () => {
+const isArrCitiesLessThanMax = () => {
     const bool = (appData.cities.length < 5);
     
     return bool;
 }
 
-const arrValidate_City = (city) => {
+const doesCityExistInArr = (city) => {
     const arr = appData.cities;
     const bool = arr.includes(city);
     
@@ -168,17 +169,17 @@ const processAndAppendData = (data) => {
         pProp.textContent = convertUnderScoreToSpace(property);
 
         if (property === "temp") {
-            tempData.celsius.temp = `${content}\xB0C`;
-            tempData.farenheit.temp = `${convertToFarenheit(content)}\xB0F`;
+            sessionData.celsius.temp = `${content}\xB0C`;
+            sessionData.farenheit.temp = `${convertToFarenheit(content)}\xB0F`;
         }
 
         if (property === "feels_like") {
-            tempData.celsius.feels_like = `${content}\xB0C`;
-            tempData.farenheit.feels_like = `${convertToFarenheit(content)}\xB0F`;
+            sessionData.celsius.feels_like = `${content}\xB0C`;
+            sessionData.farenheit.feels_like = `${convertToFarenheit(content)}\xB0F`;
         }
 
         if (tempUnit === "celsius") {
-            const celsius = tempData.celsius;
+            const celsius = sessionData.celsius;
 
             for (let prop in celsius) {
                 if (prop == property) {
@@ -188,7 +189,7 @@ const processAndAppendData = (data) => {
         }
 
         if (tempUnit === "farenheit") {
-            const farenheit = tempData.farenheit;
+            const farenheit = sessionData.farenheit;
 
             for (let prop in farenheit) {
                 if (prop === property) {
@@ -303,14 +304,14 @@ const updateTempListItems = () => {
         let property = arrIDs[i].substring(9);
 
         if (tempStandard === "celsius") {
-            const dataCelsius = tempData.celsius; 
+            const dataCelsius = sessionData.celsius; 
             for (let data in dataCelsius) {
                 if (data === property) {
                     p.textContent = dataCelsius[data];
                 }
             }
         } else if (tempStandard === "farenheit") {
-            const dataFarenheit = tempData.farenheit;
+            const dataFarenheit = sessionData.farenheit;
 
             for (let data in dataFarenheit) {
                 if (data === property) {
@@ -419,10 +420,7 @@ btnSubmit.onclick = function() {
     let val = inputSubmit.value;
         val = trimString(val);
     
-    if (arrValidate_Length() && val.length > 0 && arrValidate_City(val) === false) {
-        addCityToAppData(val); //await success from callPositionStackAPI()
-        appendToListSavedCities(val); //await success from callPositionStackAPI()
-        
+    if (isArrCitiesLessThanMax() && val.length > 0 && doesCityExistInArr(val) === false) {
         return callPositionStackAPI(val);
     } else {
         return handleErrors("appData is too long!");
@@ -502,6 +500,9 @@ const callIpAPI = () => {
 
 const forwardResponseFromPositionStackAPI = (response) => {
     let {latitude, longitude} = response.data[0];
+    
+    addCityToAppData(val);
+    appendToListSavedCities(val);
     
     return callOpenWeatherAPI(latitude, longitude);
 }
