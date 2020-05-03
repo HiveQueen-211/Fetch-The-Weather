@@ -142,7 +142,7 @@ const convertTo24hr = (val) => {
 
 
 /* START -- DOM MANIPULATION */
-const appendToCurrentWeather = (data) => {
+const processAndAppendData = (data) => {
     const ul_current = document.querySelector("#current-weather");
     let frag = document.createDocumentFragment();
     
@@ -175,6 +175,16 @@ const appendToCurrentWeather = (data) => {
         if (property === "feels_like") {
             tempData.celsius.feels_like = `${content}\xB0C`;
             tempData.farenheit.feels_like = `${convertToFarenheit(content)}\xB0F`;
+        }
+
+        if (tempUnit === "celsius") {
+            const celsius = tempData.celsius;
+
+            for (let prop in celsius) {
+                if (prop == property) {
+                    content = celsius[prop];
+                }
+            }
         }
 
         if (tempUnit === "farenheit") {
@@ -511,7 +521,7 @@ const forwardResponseFromGeoLocation = () => {
 const renderResponse = (response) => {
     updateNumberOfCities();
 
-    return appendToCurrentWeather(response); 
+    return processAndAppendData(response); 
 };
 /* END -- API CALLS */
 
