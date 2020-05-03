@@ -97,12 +97,12 @@ const convertUnderScoreToSpace = (str) => {
 /* START -- UNIT CONVERSION FUNCTIONS */ 
 const convertToCelsius = (val) => {
     const celsius = (val * (9 / 5)) + 32;
-    return celsius.toFixed(2);
+    return `${celsius.toFixed(1)}`;
 }
 
 const convertToFarenheit = (val) => {
     const farenheit = (val - 32) * (5 / 9);
-    return farenheit.toFixed(2);
+    return farenheit.toFixed(1);
 }
 
 const convertTo12hr = (val) => {
@@ -168,13 +168,13 @@ const appendToCurrentWeather = (data) => {
         pProp.textContent = convertUnderScoreToSpace(property);
 
         if (property === "temp") {
-            tempData.celsius.temp = content;
-            tempData.farenheit.temp = convertToFarenheit(content);
+            tempData.celsius.temp = `${content}\xB0C`;
+            tempData.farenheit.temp = `${convertToFarenheit(content)}\xB0F`;
         }
 
         if (property === "feels_like") {
-            tempData.celsius.feels_like = content;
-            tempData.farenheit.feels_like = convertToFarenheit(content);
+            tempData.celsius.feels_like = `${content}\xB0C`;
+            tempData.farenheit.feels_like = `${convertToFarenheit(content)}\xB0F`;
         }
 
         if (tempUnit === "farenheit") {
