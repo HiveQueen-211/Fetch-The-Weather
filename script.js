@@ -36,6 +36,14 @@ const addCityToAppData = (city) => {
     }
 }
 
+const addCurrentLocationToSessionData = (strLocation) => {
+    if (strLocation != sessionData.currentLocation) {
+        return sessionData.currentLocation = strLocation;
+    } else {
+        return false;
+    }
+}
+
 const removeCityFromAppData = (name) => {
     const arr = appData.cities;
     
@@ -233,8 +241,8 @@ const clearDOMCurrentWeather = () => {
     return ul_current;
 }
 
-const appendToListSavedCities = (data) => {
-    const ul_savedCities = document.querySelector('#list-saved-cities');
+const ul_savedCities = document.querySelector('#list-saved-cities');
+    const appendToDOMSavedCities = (data) => {
     const frag = document.createDocumentFragment();
     
     const li = document.createElement("li");
@@ -259,7 +267,7 @@ const appendToListSavedCities = (data) => {
 
 const loadCitiesToList = () => {
     appData.cities.forEach(data => {
-        return appendToListSavedCities(data);
+        return appendToDOMSavedCities(data);
     });
 }
 
@@ -419,11 +427,13 @@ const btnSubmit = document.querySelector('#search-bar button[type="submit"]');
 btnSubmit.onclick = function() {
     let val = inputSubmit.value;
         val = trimString(val);
-    
-    if (isArrCitiesLessThanMax() && val.length > 0 && doesCityExistInArr(val) === false) {
+
+    if (val === sessionData.currentLocation) return;
+
+    if (isArrCitiesLessThanMax() && val.length > 0) {
         return callPositionStackAPI(val);
     } else {
-        return handleErrors("appData is too long!");
+        return handleErrors("Max number of cities reached");
     }
 }
 
@@ -458,6 +468,8 @@ liSavedCities.onclick = function(event) {
             break;
         }
     }
+
+    if (val === sessionData.currentLocation) return;
 
     if (val) return callPositionStackAPI(val);
 }
@@ -499,10 +511,14 @@ const callIpAPI = () => {
 }
 
 const forwardResponseFromPositionStackAPI = (response) => {
-    let {latitude, longitude} = response.data[0];
+    let {latitude, longitude, name } = response.data[0];
     
-    addCityToAppData(val);
-    appendToListSavedCities(val);
+    addCurrentLocationToSessionData(name);
+
+    if (doesCityExistInArr(name) === false) {
+        addCityToAppData(name);
+        appendToDOMSavedCities(name);
+    }
     
     return callOpenWeatherAPI(latitude, longitude);
 }
