@@ -422,6 +422,25 @@ checkTimeUnit.onclick = function() {
     }
 }
 
+const btnFetchByGeo = document.querySelector('#fetch-by-geo'); 
+btnFetchByGeo.onclick = function() {
+    if (sessionData.currentLocation != "geo") {
+        forwardResponseFromGeoLocation()
+        .then((data) => { 
+            sessionData.currentLocation = "geo";
+            callOpenWeatherAPI(data.coords.latitude, data.coords.longitude) 
+        }).catch((err) => {
+            return handleErrors(err);
+        });
+    } else return;
+}
+
+const btnFetchByIp = document.querySelector('#fetch-by-ip');
+btnFetchByIp.onclick = function() {
+    if (sessionData.currentLocation != "ip") {
+        return callIpAPI();
+    } else return;
+}
 
 const btnSubmit = document.querySelector('#search-bar button[type="submit"]');
 btnSubmit.onclick = function() {
@@ -473,6 +492,8 @@ liSavedCities.onclick = function(event) {
 
     if (val) return callPositionStackAPI(val);
 }
+
+
 /* END: EVENT LISTENERS */
 
 
@@ -499,15 +520,14 @@ const callPositionStackAPI = (city) => {
 }
 
 const callIpAPI = () => {
-    if (confirm("Fetch The Weather with this device's IP address?")) {
-        const callURL = `http://ip-api.com/json/?fields=status,message,query,lat,lon`;
-        
-        return fetch(callURL)
-        .then(response => response.json())
-        .then(forwardResponseFromIpAPI)
-        .catch(err => { handleErrors(err) });
-    }
-    return;
+    const callURL = `http://ip-api.com/json/?fields=status,message,query,lat,lon`;
+    
+    sessionData.currentLocation = "ip";
+
+    return fetch(callURL)
+    .then(response => response.json())
+    .then(forwardResponseFromIpAPI)
+    .catch(err => { handleErrors(err) });
 }
 
 const forwardResponseFromPositionStackAPI = (response) => {
@@ -547,7 +567,7 @@ const renderResponse = (response) => {
 const handleErrors = (data) => {
     switch (data.code) {
         case 1:
-            callIpAPI();
+            if (confirm("Fetch The Weather with this device's IP address?")) callIpAPI();
             break;
         case 2:
             showError("Geolocation cannot connect to the internet", data.code);
@@ -569,6 +589,7 @@ const handleErrors = (data) => {
 /* START -- SCRIPT INITIALIZATION */
 forwardResponseFromGeoLocation()
 .then((data) => { 
+    sessionData.currentLocation = "geo";
     callOpenWeatherAPI(data.coords.latitude, data.coords.longitude) 
 }).catch((err) => {
     return handleErrors(err);
