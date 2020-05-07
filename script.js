@@ -158,6 +158,7 @@ const processAndAppendData = (data) => {
     const current = data.current;
     const timeStandard = appData.settings.timeStandard;
     const tempUnit = appData.settings.temperature;
+    const arrIgnore = ["wind_deg", "dt", "weather", "clouds", "humidity", "dew_point", "visibility", "pressure"];
 
     clearDOMCurrentWeather();
 
@@ -166,7 +167,7 @@ const processAndAppendData = (data) => {
         let property = item;
         let content = current[item];
         
-        if (property === "dt" || property === "weather") continue;
+        if (arrIgnore.includes(property)) continue;
         
         let li = document.createElement('li');
         let pData = document.createElement('p');
@@ -200,16 +201,24 @@ const processAndAppendData = (data) => {
             const farenheit = sessionData.farenheit;
 
             for (let prop in farenheit) {
+                
                 if (prop === property) {
                     content = farenheit[prop];
                 }
             }
         }
 
+        if (property === "wind_speed") content = content + "mph";
+
         if (property != "uvi") pProp.textContent = titleCaseString(pProp.textContent);
-        else if (property === "uvi") pProp.textContent = pProp.textContent.toUpperCase();
+        
+        if (property === "uvi") {
+            content = content + "%";
+            pProp.textContent = pProp.textContent.toUpperCase();
+        }
 
         if (property === "sunrise" || property === "sunset") {
+            
             if (timeStandard === 12) {
                 content = formatIncomingTimeString(content);
                 content = convertTo12hr(content);
