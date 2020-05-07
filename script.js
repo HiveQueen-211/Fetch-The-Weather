@@ -527,6 +527,7 @@ liSavedCities.onclick = function(event) {
             const parent = elm.closest("li");
             const id = parent.id.substring(3);
             removeCityFromAppData(id);
+            updateNumberOfCities();
             liSavedCities.removeChild(parent);
             break;
         }
