@@ -11,7 +11,9 @@ if (!localStorage.fetchTheWeather || localStorage.fetchTheWeather === "[]") {
 let appData = JSON.parse(localStorage.fetchTheWeather);
 
 const sessionData = {
-    currentLocation: "",
+    location: "",
+    lat: "",
+    long: "",
     celsius: {
         temp: "",
         feels_like: ""
@@ -36,9 +38,12 @@ const addCityToAppData = (city) => {
     }
 }
 
-const addCurrentLocationToSessionData = (strLocation) => {
-    if (strLocation != sessionData.currentLocation) {
-        return sessionData.currentLocation = strLocation;
+const addCurrentLocationToSessionData = (location, lat = "", long = "") => {
+    if (location != sessionData.location) {
+        sessionData.lat = lat;
+        sessionData.long = long;
+        
+        return sessionData.location = location;
     } else {
         return false;
     }
@@ -154,21 +159,47 @@ const convertTo24hr = (val) => {
 const processAndAppendData = (data) => {
     const ul_current = document.querySelector("#current-weather");
     let frag = document.createDocumentFragment();
+    let li_mainTab = document.createElement('li');
+        li_mainTab.id = 'main-tab';
+    let ul_mainTab = document.createElement('ul');
+
+    let li_currentLocation = document.createElement('li');
+        li_currentLocation.id = 'current-location';
+        
+    let pLocation = document.createElement('p');
+        pLocation.textContent = `${sessionData.location}`;
     
+    li_currentLocation.appendChild(pLocation);
+
+    if (sessionData.location === 'IP Address' ||
+        sessionData.location === 'Geolocation') {
+            let pLat = document.createElement('p');
+                pLat.textContent = `Latitude: ${sessionData.lat.toFixed(2)}`;
+            let pLong = document.createElement('p');
+                pLong.textContent = `Longitude: ${sessionData.long.toFixed(2)}`;
+
+            li_currentLocation.appendChild(pLat);
+            li_currentLocation.appendChild(pLong);
+            console.log('sessionData.location equals ip or Geo');
+        }
+
+    ul_mainTab.appendChild(li_currentLocation);
+    console.log(ul_current);
+
     const current = data.current;
     const timeStandard = appData.settings.timeStandard;
     const tempUnit = appData.settings.temperature;
-    const arrIgnore = ["wind_deg", "dt", "weather", "clouds", "humidity", "dew_point", "visibility", "pressure"];
+    const arrIgnore = ["wind_deg", "dt", "weather", "clouds", "humidity", "dew_point", "visibility", "pressure", "wind_gust"];
+    const arrMainTabProps = ["location", "temp", "feels_like", "sunrise", "sunset"];
 
     clearDOMCurrentWeather();
 
     for (let item in current) {
-
         let property = item;
         let content = current[item];
         
         if (arrIgnore.includes(property)) continue;
-        
+
         let li = document.createElement('li');
         let pData = document.createElement('p');
         let pProp = document.createElement('p');
@@ -176,6 +207,7 @@ const processAndAppendData = (data) => {
         li.id = `current-${property}`;
 
         pProp.textContent = convertUnderScoreToSpace(property);
+        if (property != "uvi") pProp.textContent = titleCaseString(pProp.textContent);
 
         if (property === "temp") {
             sessionData.celsius.temp = `${content}\xB0C`;
@@ -210,8 +242,6 @@ const processAndAppendData = (data) => {
 
         if (property === "wind_speed") content = content + "mph";
 
-        if (property != "uvi") pProp.textContent = titleCaseString(pProp.textContent);
-        
         if (property === "uvi") {
             content = content + "%";
             pProp.textContent = pProp.textContent.toUpperCase();
@@ -234,8 +264,16 @@ const processAndAppendData = (data) => {
         li.appendChild(pData);
         li.appendChild(pProp);
         
-        frag.appendChild(li);
+        if (arrMainTabProps.includes(property)) {
+            ul_mainTab.appendChild(li);
+        } else {
+            frag.appendChild(li);
+        }
+        
     }
+
+    li_mainTab.appendChild(ul_mainTab);
+    ul_current.appendChild(li_mainTab);
     
     return ul_current.appendChild(frag);
 }
@@ -431,12 +469,12 @@ checkTimeUnit.onclick = function() {
     }
 }
 
-const btnFetchByGeo = document.querySelector('#fetch-by-geo'); 
+const btnFetchByGeo = document.querySelector('#fetch-by-Geo'); 
 btnFetchByGeo.onclick = function() {
-    if (sessionData.currentLocation != "geo") {
+    if (sessionData.location != "Geo") {
         forwardResponseFromGeoLocation()
         .then((data) => { 
-            sessionData.currentLocation = "geo";
+            sessionData.location = "Geo";
             callOpenWeatherAPI(data.coords.latitude, data.coords.longitude) 
         }).catch((err) => {
             return handleErrors(err);
@@ -446,7 +484,7 @@ btnFetchByGeo.onclick = function() {
 
 const btnFetchByIp = document.querySelector('#fetch-by-ip');
 btnFetchByIp.onclick = function() {
-    if (sessionData.currentLocation != "ip") {
+    if (sessionData.location != "ip") {
         return callIpAPI();
     } else return;
 }
@@ -456,7 +494,7 @@ btnSubmit.onclick = function() {
     let val = inputSubmit.value;
         val = trimString(val);
 
-    if (val === sessionData.currentLocation) return;
+    if (val === sessionData.location) return;
 
     if (isArrCitiesLessThanMax() && val.length > 0) {
         return callPositionStackAPI(val);
@@ -497,7 +535,7 @@ liSavedCities.onclick = function(event) {
         }
     }
 
-    if (val === sessionData.currentLocation) return;
+    if (val === sessionData.location) return;
 
     if (val) return callPositionStackAPI(val);
 }
@@ -531,8 +569,6 @@ const callPositionStackAPI = (city) => {
 const callIpAPI = () => {
     const callURL = `http://ip-api.com/json/?fields=status,message,query,lat,lon`;
     
-    sessionData.currentLocation = "ip";
-
     return fetch(callURL)
     .then(response => response.json())
     .then(forwardResponseFromIpAPI)
@@ -542,7 +578,7 @@ const callIpAPI = () => {
 const forwardResponseFromPositionStackAPI = (response) => {
     let {latitude, longitude, name } = response.data[0];
     
-    addCurrentLocationToSessionData(name);
+    addCurrentLocationToSessionData(name, latitude, longitude);
 
     if (doesCityExistInArr(name) === false) {
         addCityToAppData(name);
@@ -555,6 +591,8 @@ const forwardResponseFromPositionStackAPI = (response) => {
 const forwardResponseFromIpAPI = (response) => {
     let {lat, lon} = response;
     
+    addCurrentLocationToSessionData('IP Address', lat, lon);
+
     return callOpenWeatherAPI(lat, lon);
 }
 
@@ -598,8 +636,11 @@ const handleErrors = (data) => {
 /* START -- SCRIPT INITIALIZATION */
 forwardResponseFromGeoLocation()
 .then((data) => { 
-    sessionData.currentLocation = "geo";
-    callOpenWeatherAPI(data.coords.latitude, data.coords.longitude) 
+    const lat = data.coords.latitude;
+    const long = data.coords.longitude;
+
+    addCurrentLocationToSessionData('Geolocation', lat, long);
+    callOpenWeatherAPI(lat, long); 
 }).catch((err) => {
     return handleErrors(err);
 });
