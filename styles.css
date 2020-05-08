@@ -3,6 +3,8 @@
     --width-wrapper: 42rem;
     --width-tab: 15rem;
     --width-container-controls: 20em;
+    --width-switch-container: 6rem;
+    --width-switch: 3.25rem;
     --height-tab: 4rem;
     --height-elm-control: 3em;
 
@@ -71,10 +73,56 @@ header,
     margin-bottom: .75em;
 }
 
-#container-controls .switch { display: flex; }
-#container-controls .switch { width: 50%; height: var(--height-elm-control); }
-#container-controls .switch > * { width: 100%; }
-#container-controls .switch input[type="checkbox"] { display: flex; }
+#container-controls .switch {
+    display: flex; 
+}
+#container-controls .switch:first-of-type { margin-right: .5em; }
+#container-controls .switch label { 
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: var(--width-switch-container); 
+    height: var(--height-elm-control); 
+    border-radius: 2em;
+    background-color: #fff;
+    box-shadow: 0px 1px 4px 0px var(--rgba-shadow) inset;
+}
+#container-controls .switch label div {
+    position: absolute;
+    width: var(--width-switch);
+    height: var(--width-switch);
+    border-radius: 2em;
+    background-color: rgb(237, 237, 237);
+    box-shadow: 0px 1px 2px 0px var(--rgba-shadow);
+    z-index: 5;
+    left: 0;
+    transition: .2s ease-out;
+}
+#container-controls .switch input[type="checkbox"] { display: none; }
+#container-controls .switch input[type="checkbox"]:checked + label div {
+    left: calc(var(--width-switch-container) - var(--width-switch));
+}
+
+.switch::before,
+.switch::after {
+    position: relative;
+    margin: .2rem;
+    top: calc( ( var(--height-elm-control) / 2 ) - .2rem );
+    font-size: .75rem;
+    color: var(--rgba-shadow);
+}
+
+.switch::before { color: pink; }
+.switch::after { color: var(--rgba-shadow); }
+
+.switch.switch-right::before { color: var(--rgba-shadow); }
+.switch.switch-right::after { color: pink; }
+
+#container-controls #switch-temp-format::before { content: "°C"; }
+#container-controls #switch-temp-format::after { content: "°F"; }
+#container-controls #switch-hour-format::before { content: "12h"; }
+#container-controls #switch-hour-format::after { content: "24h"; }
+
 
 #container-controls ul { width: 100%; }
 

@@ -160,7 +160,7 @@ const processAndAppendData = (data) => {
     const current = data.current;
     const timeStandard = appData.settings.timeStandard;
     const tempUnit = appData.settings.temperature;
-    
+
     const arrIgnore = ["wind_deg", "dt", "weather", "clouds", "humidity", "dew_point", "visibility", "pressure", "wind_gust"];
     const arrMainTabProps = ["location", "temp", "feels_like", "sunrise", "sunset"];
     
@@ -180,22 +180,13 @@ const processAndAppendData = (data) => {
     
     li_currentLocation.appendChild(pLocation);
 
-    switch (sessionData.location) {
-        case 'IP Address':
-        case 'Geolocation': {
-            let pLat = document.createElement('p');
-                pLat.textContent = `Latitude: ${sessionData.lat.toFixed(2)}`;
-            let pLong = document.createElement('p');
-                pLong.textContent = `Longitude: ${sessionData.long.toFixed(2)}`;
+    let pLat = document.createElement('p');
+        pLat.textContent = `Latitude: ${sessionData.lat.toFixed(2)}`;
+    let pLong = document.createElement('p');
+        pLong.textContent = `Longitude: ${sessionData.long.toFixed(2)}`;
 
-            li_currentLocation.appendChild(pLat);
-            li_currentLocation.appendChild(pLong);
-            break;
-        }
-        default: {
-            break;
-        }
-    }
+    li_currentLocation.appendChild(pLat);
+    li_currentLocation.appendChild(pLong);
 
     ul_mainTab.appendChild(li_currentLocation);
 
@@ -274,7 +265,6 @@ const processAndAppendData = (data) => {
                 const farenheit = sessionData.farenheit;
 
                 for (let prop in farenheit) {
-                    
                     if (prop === property) {
                         content = farenheit[prop];
                     }
@@ -355,9 +345,11 @@ const updateNumberOfCities = () => {
 
 const updateCheckTimeUnit = () => {
     const timeStandard = appData.settings.timeStandard;
+    const parent = checkTimeUnit.closest('section');
 
     if (timeStandard === 24) {
         checkTimeUnit.checked = true;
+        parent.classList.add('switch-right');
     } else {
         checkTimeUnit.checked = false;
     }
@@ -367,9 +359,11 @@ const updateCheckTimeUnit = () => {
 
 const updateCheckTempUnit = () => {
     const tempUnit = appData.settings.temperature;
+    const parent = checkTempUnit.closest('section');
 
     if (tempUnit === "farenheit") {
         checkTempUnit.checked = true;
+        parent.classList.add('switch-right');
     } else {
         checkTempUnit.checked = false;
     }
@@ -466,16 +460,19 @@ const asideControls = document.querySelector('#container-controls');
 const checkTempUnit = document.querySelector('#unit-temp');
 checkTempUnit.onclick = function() {
     const checked = checkTempUnit.checked;
+    const parent = checkTempUnit.closest('section');
 
     if (checked) {
         appData.settings.temperature = "farenheit";
         localStorage.setItem("fetchTheWeather", JSON.stringify(appData));
+        parent.classList.add('switch-right');
 
         return updateTempListItems();
     } else if (!checked) {
         appData.settings.temperature = "celsius";
         localStorage.setItem("fetchTheWeather", JSON.stringify(appData));
-        
+        parent.classList.remove('switch-right');
+
         return updateTempListItems();
     }
 }
@@ -483,15 +480,18 @@ checkTempUnit.onclick = function() {
 const checkTimeUnit = document.querySelector('#unit-time');
 checkTimeUnit.onclick = function() {
     const checked = checkTimeUnit.checked;
+    const parent = checkTimeUnit.closest('section');
 
     if (checked) {
         appData.settings.timeStandard = 24;
         localStorage.setItem("fetchTheWeather", JSON.stringify(appData));
-        
+        parent.classList.add('switch-right');
+
         return updateTimeListItems();
     } else if (!checked) {
         appData.settings.timeStandard = 12;
         localStorage.setItem("fetchTheWeather", JSON.stringify(appData));
+        parent.classList.remove('switch-right');
 
         return updateTimeListItems();
     }
@@ -499,11 +499,14 @@ checkTimeUnit.onclick = function() {
 
 const btnFetchByGeo = document.querySelector('#fetch-by-Geo'); 
 btnFetchByGeo.onclick = function() {
-    if (sessionData.location != "Geo") {
+    if (sessionData.location != "Geolocation") {
         forwardResponseFromGeoLocation()
         .then((data) => { 
-            sessionData.location = "Geo";
-            callOpenWeatherAPI(data.coords.latitude, data.coords.longitude) 
+            const lat = data.coords.latitude;
+            const long = data.coords.longitude;
+
+            addCurrentLocationToSessionData('Geolocation', lat, long);
+            callOpenWeatherAPI(lat, long); 
         }).catch((err) => {
             return handleErrors(err);
         });
