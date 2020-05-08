@@ -157,8 +157,17 @@ const convertTo24hr = (val) => {
 
 /* START -- DOM MANIPULATION */
 const processAndAppendData = (data) => {
+    const current = data.current;
+    const timeStandard = appData.settings.timeStandard;
+    const tempUnit = appData.settings.temperature;
+    
+    const arrIgnore = ["wind_deg", "dt", "weather", "clouds", "humidity", "dew_point", "visibility", "pressure", "wind_gust"];
+    const arrMainTabProps = ["location", "temp", "feels_like", "sunrise", "sunset"];
+    
     const ul_current = document.querySelector("#current-weather");
+    
     let frag = document.createDocumentFragment();
+    
     let li_mainTab = document.createElement('li');
         li_mainTab.id = 'main-tab';
     let ul_mainTab = document.createElement('ul');
@@ -171,8 +180,9 @@ const processAndAppendData = (data) => {
     
     li_currentLocation.appendChild(pLocation);
 
-    if (sessionData.location === 'IP Address' ||
-        sessionData.location === 'Geolocation') {
+    switch (sessionData.location) {
+        case 'IP Address':
+        case 'Geolocation': {
             let pLat = document.createElement('p');
                 pLat.textContent = `Latitude: ${sessionData.lat.toFixed(2)}`;
             let pLong = document.createElement('p');
@@ -180,17 +190,14 @@ const processAndAppendData = (data) => {
 
             li_currentLocation.appendChild(pLat);
             li_currentLocation.appendChild(pLong);
-            console.log('sessionData.location equals ip or Geo');
+            break;
         }
+        default: {
+            break;
+        }
+    }
 
     ul_mainTab.appendChild(li_currentLocation);
-    console.log(ul_current);
-
-    const current = data.current;
-    const timeStandard = appData.settings.timeStandard;
-    const tempUnit = appData.settings.temperature;
-    const arrIgnore = ["wind_deg", "dt", "weather", "clouds", "humidity", "dew_point", "visibility", "pressure", "wind_gust"];
-    const arrMainTabProps = ["location", "temp", "feels_like", "sunrise", "sunset"];
 
     clearDOMCurrentWeather();
 
@@ -207,56 +214,77 @@ const processAndAppendData = (data) => {
         li.id = `current-${property}`;
 
         pProp.textContent = convertUnderScoreToSpace(property);
-        if (property != "uvi") pProp.textContent = titleCaseString(pProp.textContent);
-
-        if (property === "temp") {
-            sessionData.celsius.temp = `${content}\xB0C`;
-            sessionData.farenheit.temp = `${convertToFarenheit(content)}\xB0F`;
-        }
-
-        if (property === "feels_like") {
-            sessionData.celsius.feels_like = `${content}\xB0C`;
-            sessionData.farenheit.feels_like = `${convertToFarenheit(content)}\xB0F`;
-        }
-
-        if (tempUnit === "celsius") {
-            const celsius = sessionData.celsius;
-
-            for (let prop in celsius) {
-                if (prop == property) {
-                    content = celsius[prop];
-                }
-            }
-        }
-
-        if (tempUnit === "farenheit") {
-            const farenheit = sessionData.farenheit;
-
-            for (let prop in farenheit) {
-                
-                if (prop === property) {
-                    content = farenheit[prop];
-                }
-            }
-        }
-
-        if (property === "wind_speed") content = content + "mph";
 
         if (property === "uvi") {
-            content = content + "%";
             pProp.textContent = pProp.textContent.toUpperCase();
+        } else {
+            pProp.textContent = titleCaseString(pProp.textContent);
         }
 
-        if (property === "sunrise" || property === "sunset") {
-            
-            if (timeStandard === 12) {
-                content = formatIncomingTimeString(content);
-                content = convertTo12hr(content);
-            } else if (timeStandard === 24) {
-                content = formatIncomingTimeString(content);
+        switch (property) {
+            case 'temp': {
+                sessionData.celsius.temp = `${content}\xB0C`;
+                sessionData.farenheit.temp = `${convertToFarenheit(content)}\xB0F`;
+
+                break;
             }
+            case 'feels_like': {
+                sessionData.celsius.feels_like = `${content}\xB0C`;
+                sessionData.farenheit.feels_like = `${convertToFarenheit(content)}\xB0F`;
+
+                break;
+            }
+            case 'wind_speed': {
+                content = content + "mph";
+
+                break;
+            }
+            case 'uvi': {
+                content = content + "%";
+
+                break;
+            }
+            case 'sunrise':
+            case 'sunset': {
+                if (timeStandard === 12) {
+                    content = formatIncomingTimeString(content);
+                    content = convertTo12hr(content);
+                } else if (timeStandard === 24) {
+                    content = formatIncomingTimeString(content);
+                }
+
+                break;
+            }
+            default: break;
         }
-        
+
+        switch (tempUnit) {
+            case 'celsius': {
+                const celsius = sessionData.celsius;
+
+                for (let prop in celsius) {
+                    if (prop == property) {
+                        content = celsius[prop];
+                    }
+                }
+
+                break;   
+            }
+            case 'farenheit': {
+                const farenheit = sessionData.farenheit;
+
+                for (let prop in farenheit) {
+                    
+                    if (prop === property) {
+                        content = farenheit[prop];
+                    }
+                }
+
+                break;   
+            }
+            default: break;
+        }
+
         if (typeof content === "number" || typeof content === "string") {
             pData.textContent = content;
         }
