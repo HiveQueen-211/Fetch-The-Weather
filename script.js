@@ -82,10 +82,12 @@ const trimString = (str) => {
 const formatIncomingTimeString = (date) => {
     let newDate = new Date(date*1000);
     let hours = newDate.getHours().toString();
-
+    let minutes = newDate.getMinutes().toString();
+    
     if (hours.length === 1) hours = `0${hours}`;
+    if (minutes.length === 1) minutes = `0${minutes}`;
 
-    let strTime = `${hours}.${newDate.getMinutes()}`;
+    let strTime = `${hours}.${minutes}`;
 
     return strTime;
 }
@@ -157,6 +159,7 @@ const convertTo24hr = (val) => {
 
 /* START -- DOM MANIPULATION */
 const processAndAppendData = (data) => {
+    console.log(data);
     const current = data.current;
     const timeStandard = appData.settings.timeStandard;
     const tempUnit = appData.settings.temperature;
