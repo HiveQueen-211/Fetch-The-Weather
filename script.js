@@ -159,7 +159,6 @@ const convertTo24hr = (val) => {
 
 /* START -- DOM MANIPULATION */
 const processAndAppendData = (data) => {
-    console.log(data);
     const current = data.current;
     const timeStandard = appData.settings.timeStandard;
     const tempUnit = appData.settings.temperature;
