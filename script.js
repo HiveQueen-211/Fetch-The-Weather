@@ -164,10 +164,11 @@ const processAndAppendData = (data) => {
     const timeStandard = appData.settings.timeStandard;
     const tempUnit = appData.settings.temperature;
 
-    const arrIgnore = ["wind_deg", "dt", "weather", "clouds", "humidity", "dew_point", "visibility", "pressure", "wind_gust"];
-    const arrMainTabProps = ["location", "temp", "feels_like", "sunrise", "sunset"];
-    
-    const ul_current = document.querySelector("#current-weather");
+    const arrIgnore = ["wind_deg", "dt", "clouds", "humidity", "dew_point", "visibility", "pressure", "wind_gust"];
+    const arrMainTabProps = ["location", "temp", "feels_like", "sunrise", "sunset", "weather"];
+    const arrIgnoreProps = ["weather", "temp"];
+
+    const ul_current = document.querySelector("#ul-weather");
     
     let frag = document.createDocumentFragment();
     
@@ -216,6 +217,12 @@ const processAndAppendData = (data) => {
         }
 
         switch (property) {
+            case 'weather': {
+                let { main } = content[0];
+                content = main;            
+
+                break;
+            }
             case 'temp': {
                 sessionData.celsius.temp = `${content}\xB0C`;
                 sessionData.farenheit.temp = `${convertToFarenheit(content)}\xB0F`;
@@ -283,7 +290,7 @@ const processAndAppendData = (data) => {
         }
         
         li.appendChild(pData);
-        li.appendChild(pProp);
+        if (!arrIgnoreProps.includes(property)) li.appendChild(pProp);
         
         if (arrMainTabProps.includes(property)) {
             ul_mainTab.appendChild(li);
@@ -300,7 +307,7 @@ const processAndAppendData = (data) => {
 }
 
 const clearDOMCurrentWeather = () => {
-    const ul_current = document.querySelector("#current-weather");
+    const ul_current = document.querySelector("#ul-weather");
     
     while (ul_current.firstChild) {
         ul_current.removeChild(ul_current.lastChild);
@@ -531,7 +538,7 @@ btnSubmit.onclick = function() {
     if (val === sessionData.location) return;
 
     if (isArrCitiesLessThanMax() && val.length > 0) {
-        return callPositionStackAPI(val);
+        return callPositionStackFwdAPI(val);
     } else {
         return handleErrors("Max number of cities reached");
     }
@@ -572,7 +579,7 @@ liSavedCities.onclick = function(event) {
 
     if (val === sessionData.location) return;
 
-    if (val) return callPositionStackAPI(val);
+    if (val) return callPositionStackFwdAPI(val);
 }
 
 
@@ -591,7 +598,12 @@ const callOpenWeatherAPI = (latitude, longitude) => {
     .catch(err => { handleErrors(err) });
 }
 
-const callPositionStackAPI = (city) => { 
+const callPositionStackRevAPI = (lat, long) => {
+    const apiKey = `74d5b9f01b4b1c640e8b2c7a401a3f33`;
+    const callURL = `http://api.positionstack.com/v1/reverse?access_key=${apiKey}&query=${lat},${long}`;
+}
+
+const callPositionStackFwdAPI = (city) => { 
     const apiKey = `74d5b9f01b4b1c640e8b2c7a401a3f33`;
     const callURL = `http://api.positionstack.com/v1/forward?access_key=${apiKey}&query=${city}&limit=1`;
     

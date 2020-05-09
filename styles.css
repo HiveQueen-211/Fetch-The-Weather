@@ -219,14 +219,14 @@ header i#toggle-aside {
     bottom: 0;
 }
 
-#current-weather {
+#ul-weather {
     display: grid;
     gap: 1.5em;
     grid-template-columns: repeat(auto-fit, minmax(7em, 1fr));
     grid-auto-rows: 7em;
 
 }
-#current-weather li {
+#ul-weather li {
     display: flex;
     flex-flow: column wrap;
     justify-content: center;
@@ -254,17 +254,29 @@ header i#toggle-aside {
     flex-flow: column;
     justify-content: flex-start;
 }
-#current-location p {
-    margin: .2em .5em;
+#current-location p,
+#current-weather p,
+#current-temp p {
+    margin: .2rem 10px;
     text-align: left;
     font-size: 1em;
 }
 
+#current-weather {
+    grid-column: 1 / span 2;
+    grid-row: 2;
+    display: flex;
+    flex-flow: row wrap;
+    align-content: flex-end;
+    justify-content: flex-start;
+}
+#current-weather p { margin-bottom: 0; }
+
 #current-temp {
     grid-column: 1 / span 2; 
-    grid-row: 2 / span 2; 
+    grid-row: 3; 
 }
-#current-temp p:first-of-type { font-size: 3em; margin-bottom: .07em; }
+#current-temp p { font-size: 3.5rem; margin: 0 auto .07rem .1rem; }
 
 #current-feels_like {
     grid-column: 3; 
