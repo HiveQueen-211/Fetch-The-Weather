@@ -10,14 +10,21 @@
 
     <aside id="container-controls">
         <i class="fas fa-times i-close"></i>
-        <section id="switch-temp-format" class="switch">
-            <input type="checkbox" name="" id="unit-temp">
-            <label for="unit-temp"><div></div></label>
-        </section>
-        <section id="switch-hour-format" class="switch">
-            <input type="checkbox" name="" id="unit-time">
-            <label for="unit-time"><div></div></label>
-        </section>
+        <h3>Unit Settings</h3>
+        <ul id="unit-settings">
+            <li>
+                <section id="switch-temp-format" class="switch">
+                    <input type="checkbox" name="" id="unit-temp">
+                    <label for="unit-temp"><div></div></label>
+                </section>
+            </li>
+            <li>
+                <section id="switch-hour-format" class="switch">
+                    <input type="checkbox" name="" id="unit-time">
+                    <label for="unit-time"><div></div></label>
+                </section>
+            </li>
+        </ul>
         <h3>Fetch Methods</h3>
         <ul id="list-fetch-methods">
             <li><button id="fetch-by-geo">Geolocation</button></li>
